@@ -1,0 +1,20 @@
+# Secrets — created on the server, never committed (see INSTALL.md)
+connext/settings/*
+!connext/settings/.htaccess
+!connext/settings/*.example
+
+# Runtime/user data
+connext/uploads/**
+!connext/uploads/index.html
+!connext/uploads/.htaccess
+!connext/uploads/photos/
+!connext/uploads/photos/index.html
+connext/pdf/imgcache/*
+!connext/pdf/imgcache/index.html
+connext/pdf/fontcache/*
+!connext/pdf/fontcache/index.html
+
+# Real data exports
+connext/db/source_data/*.csv
+database/
+*.sql.gz

@@ -1,0 +1,32 @@
+/* CONNEXT — css/history-report.css : หน้าประวัติเอกสาร · ตัวกรอง IC / วันที่ / ผู้นำจ่าย + Export รายงานพร้อมรูป (2026-09-30) */
+.hr-filters{display:flex;flex-wrap:wrap;gap:0.75rem 1rem;align-items:flex-end;margin:-0.25rem 0 0.75rem}
+.hr-filters .form-group{margin-bottom:0;min-width:140px}
+.hr-filters .form-group label{font-size:0.8rem}
+.hr-filters .hr-date{min-width:150px;flex:0 1 170px}
+.hr-filters .hr-ic{flex:1 1 220px;min-width:200px}
+.hr-filters .hr-payer{flex:1 1 180px;min-width:160px}
+.hr-filters .hr-clear{height:38px;margin-bottom:0;white-space:nowrap}
+.hr-actions{display:flex;flex-wrap:wrap;gap:0.5rem 1rem;align-items:center;justify-content:space-between;
+  background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius-md,10px);padding:0.55rem 0.75rem;margin-bottom:0.75rem}
+.hr-actions .hr-count{font-size:0.9rem;color:var(--text-main,#1e293b)}
+.hr-actions .hr-warn{display:inline-block;color:#b91c1c;font-weight:600;margin-left:0.25rem}
+.hr-actions .hr-export{width:auto;white-space:nowrap}
+.hr-actions .hr-export[disabled]{opacity:0.55;cursor:not-allowed}
+#historyTable .hr-sel-th,#historyTable .hr-sel-td{text-align:center;width:64px}
+#historyTable .hr-all{display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;white-space:nowrap;margin:0}
+#historyTable input.hr-sel,#historyTable #hrAll{width:18px;height:18px;min-height:0;cursor:pointer;accent-color:var(--primary,#1e3a8a)}
+#historyTable tr.hr-off td{opacity:0.45}
+#historyTable tr.hr-off td.hr-sel-td{opacity:1}
+#historyTable .hr-payer-cell{font-size:0.86rem;min-width:110px}
+#historyTable .hr-muted{color:var(--text-muted,#64748b)}
+#historyTable .hr-phs{margin-top:0.2rem;display:flex;gap:0.35rem;flex-wrap:wrap}
+#historyTable .hr-ph{display:inline-flex;align-items:center;gap:0.25rem;font-size:0.75rem;color:#0f766e;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:999px;padding:0 0.45rem;white-space:nowrap}
+#historyTable .hr-ph-link{color:#475569;background:#f1f5f9;border-color:#e2e8f0}
+#historyTable .hr-ichit{margin-top:0.2rem;font-size:0.76rem;color:#1d4ed8}
+@media(max-width:768px){
+  .hr-filters .form-group,.hr-filters .hr-date,.hr-filters .hr-ic,.hr-filters .hr-payer{flex:1 1 100%;min-width:0}
+  .hr-filters .hr-date{flex:1 1 calc(50% - 0.5rem)}
+  .hr-filters .hr-clear{width:100%}
+  .hr-actions{flex-direction:column;align-items:stretch}
+  .hr-actions .hr-export{width:100%}
+}

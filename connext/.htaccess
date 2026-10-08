@@ -1,0 +1,26 @@
+# CONNEXT — Apache config
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ห้ามเข้าไฟล์อ่อนไหว
+<FilesMatch "\.(sql|log|md|json\.dist|ini|sh)$">
+    Require all denied
+</FilesMatch>
+# manifest.json ต้องเปิดได้ (ยกเว้นจากกฎบน)
+<Files "manifest.json">
+    Require all granted
+</Files>
+
+# โฟลเดอร์ settings ห้ามเข้าทุกกรณี (มี .htaccess ชั้นในซ้ำอีกชั้น)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^settings/ - [F,L]
+    RewriteRule ^db/ - [F,L]
+    RewriteRule ^lib/ - [F,L]
+    RewriteRule ^pdf/(fonts|templates)/ - [F,L]
+</IfModule>

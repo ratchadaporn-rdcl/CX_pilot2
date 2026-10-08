@@ -1,0 +1,107 @@
+/* CONNEXT inventory identity. Presentation only; loaded after feature styles. */
+:root {
+  --primary:#102f50; --primary-light:#285f88; --secondary:#102f50;
+  --accent:#ffda4d; --background:#f2f5f8; --text-main:#20354a;
+  --text-muted:#5c6e80; --border:#dbe3eb; --navy:#102f50; --navy-2:#285f88;
+  --gold:#ffda4d; --brand-red:#b82029;
+  --shadow-sm:0 2px 8px rgba(16,47,80,.045);
+  --shadow-md:0 6px 20px rgba(16,47,80,.08);
+}
+.navbar,.appbar {border-top:4px solid var(--primary);border-bottom:1px solid var(--border);box-shadow:0 3px 16px #102f5008}
+.brand-text h1 {letter-spacing:1.3px}
+.brand-text h1::after {content:"";display:inline-block;width:7px;height:7px;background:var(--brand-red);margin-left:5px}
+.nav-link,.nav a {border-radius:9px;background:transparent;border-color:transparent}
+.nav-link:hover,.nav a:hover {background:#e9eff5;border-color:#d4e0eb}
+.nav-link.active,.nav a.on {background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:inset 0 -3px var(--accent)}
+.user-role {background:#eaf0f5;color:var(--primary)}
+.page-container {margin-top:1.4rem}
+.page-title {letter-spacing:-.45px}
+.page-subtitle {line-height:1.7}
+.metric-card,.ii-card,.data-panel,.card {border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.metric-card {position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.metric-card::before {content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary)}
+.metric-card:nth-child(2)::before {background:var(--brand-red)}
+.metric-card:nth-child(3)::before {background:var(--accent)}
+.metric-card:nth-child(4)::before {background:#208777}
+.metric-value {font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.icon-blue {background:#e8eff7;color:var(--primary)}
+.icon-red {background:#fcebed;color:var(--brand-red)}
+.icon-yellow {background:#fff5ce;color:#775a00}
+.dashboard-toolbar {background:#f8fafc;border-bottom:1px solid var(--border)}
+.data-panel thead th,.card thead th {background:#edf2f7;color:var(--primary);font-weight:600}
+.data-panel tbody tr:hover,.card tbody tr:hover {background:#f2f7fb}
+.form-control:focus,.il-group input:focus {border-color:var(--primary-light);box-shadow:0 0 0 3px #285f881a}
+:is(button,a,input,select,[role="button"]):focus-visible {outline:3px solid #3577a8;outline-offset:3px}
+.cnx-hero {position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:206px;padding:27px 32px;margin-bottom:22px;border-radius:18px;background:#102f50;color:#fff}
+.cnx-hero-art {position:absolute;inset:0 0 0 43%;z-index:-2;background:url('../assets/inventory-warehouse.png') center 54%/cover no-repeat;opacity:.86}
+.cnx-hero::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#102f50 28%,#102f50ed 43%,#102f5066 75%,#102f501a)}
+.cnx-hero-copy {max-width:62%}
+.cnx-hero-art {z-index:0}
+.cnx-hero::before {z-index:1;pointer-events:none}
+.cnx-hero-copy {position:relative;z-index:2}
+.cnx-hero .cnx-display-toggle {z-index:3}
+.cnx-hero .cnx-scan {z-index:1}
+.cnx-eyebrow {display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:2px;font-weight:600;color:#ffda4d;margin-bottom:10px}
+.cnx-eyebrow::before {content:"";width:19px;height:3px;background:#b82029}
+.cnx-hero h3 {font-size:clamp(21px,2.2vw,30px);line-height:1.5;font-weight:600;letter-spacing:-.7px;margin:0 0 5px;color:#fff}
+.cnx-hero p {font-size:13px;color:#d6e3ef;line-height:1.8;margin:0}
+.cnx-hero-actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.cnx-hero-actions button {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 15px;border-radius:8px;border:1px solid #ffffff55;background:#ffffff0a;color:#fff;font:inherit;font-size:12px;cursor:pointer;transition:background .18s}
+.cnx-hero-actions button:first-child {background:#ffda4d;border-color:#ffda4d;color:#102f50;font-weight:600}
+.cnx-hero-actions button:hover {background:#ffffff22}
+.cnx-hero-actions button:first-child:hover {background:#ffe578}
+.cnx-display-toggle {position:absolute;right:13px;top:12px;border:1px solid #ffffff50;background:#102f50d9;color:#fff;padding:6px 10px;border-radius:7px;font:inherit;font-size:11px;cursor:pointer;min-height:34px}
+.cnx-scan {position:absolute;top:15%;bottom:15%;right:12%;width:2px;background:#ffda4d;box-shadow:0 0 20px #ffda4d;opacity:0;pointer-events:none;animation:cnx-scan 3.8s ease-in-out 1}
+.cnx-hero.cnx-compact {min-height:0;padding:20px 28px}
+.cnx-compact .cnx-hero-art,.cnx-compact .cnx-scan {display:none}
+.cnx-compact .cnx-hero-copy {max-width:calc(100% - 85px)}
+.cnx-compact h3 {font-size:21px}
+.cnx-compact .cnx-hero-actions {margin-top:10px}
+.inline-login {background:#edf2f7;overflow-y:auto;padding:30px;gap:0;align-items:center}
+.cnx-login-story {width:min(600px,52vw);min-height:590px;padding:45px;position:relative;overflow:hidden;border-radius:22px 0 0 22px;background:#102f50;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate;box-shadow:0 24px 70px #102f5014}
+.cnx-login-story::before {content:"";position:absolute;inset:0;z-index:-2;background:url('../assets/inventory-warehouse.png') center/cover}
+.cnx-login-story::after {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#102f5010 10%,#102f5088 42%,#102f50 85%)}
+.cnx-login-story h2 {font-size:33px;line-height:1.45;letter-spacing:-.8px;color:#fff;margin:0 0 13px}
+.cnx-login-story p {font-size:14px;line-height:1.9;color:#dbe7f1;max-width:440px}
+.cnx-login-tags {display:flex;gap:9px;margin-top:24px;flex-wrap:wrap}
+.cnx-login-tags span {font-size:11px;padding:6px 11px;border:1px solid #ffffff38;border-radius:6px;color:#e8eff5}
+.inline-login .il-card {width:430px;max-width:100%;min-height:590px;padding:36px 38px;border-radius:0 22px 22px 0;border:1px solid #dbe3eb;box-shadow:0 24px 70px #102f5014;display:flex;flex-direction:column;justify-content:center}
+.il-brand .il-logo {width:106px;height:106px;margin:0 auto 8px;background:#fff;border-radius:12px;box-shadow:none}
+.il-brand .il-logo img {width:100%;height:100%;object-fit:contain;border-radius:0}
+.il-brand h1 {color:#102f50;letter-spacing:2px}
+.il-brand p {color:#63758a}
+.il-card .il-btn {background:#102f50;box-shadow:0 4px 12px #102f5020;border-bottom:3px solid #ffda4d;border-radius:9px;min-height:48px}
+.il-card .il-btn:hover {background:#1d496d}
+.il-card .il-group input {border-radius:9px;background:#f8fafc;min-height:47px}
+.il-card .il-footer {font-size:10px;color:#63758a;margin-top:22px}
+.cnx-login-layout {display:grid;grid-template-columns:1.4fr 1fr;width:min(1030px,100%);align-items:stretch}
+.cnx-login-layout .cnx-login-story {width:auto;min-height:590px}
+.cnx-login-layout .il-card {width:100%;background:#fff;color:#20354a;min-height:590px}
+.il-card h2,.il-card .il-group label {color:#20354a}
+.il-card .il-group input {color:#20354a;border:1px solid #cbd6e0}
+.il-card .il-group input::placeholder {color:#718096;opacity:1}
+.il-card .il-btn {color:#fff}
+.cnx-value-updated {animation:cnx-value .65s ease-out}
+@keyframes cnx-value {from {color:#285f88;transform:translateY(3px)} to {transform:translateY(0)}}
+@keyframes cnx-scan {0% {right:3%;opacity:0} 20% {opacity:.65} 80% {opacity:.65} 100% {right:47%;opacity:0}}
+@media(hover:hover) {.metric-card:hover {transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:#b7c9d9}}
+@media(min-width:1150px) {#dashboard-page > .metrics-grid {grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}#dashboard-page > .metrics-grid .metric-card {padding:18px 14px;gap:12px}#dashboard-page > .metrics-grid .metric-icon {width:44px;height:44px;font-size:20px;flex-shrink:0}}
+@media(max-width:900px) {.cnx-login-story {width:48vw;padding:30px;min-height:560px}.cnx-login-story h2 {font-size:27px}.inline-login .il-card {min-height:560px;padding:28px}.cnx-hero-copy {max-width:76%}}
+@media(max-width:640px) {
+  .cnx-login-layout {display:flex;flex-direction:column;max-width:430px}
+  .cnx-login-layout .cnx-login-story {min-height:190px}
+  .cnx-login-layout .il-card {min-height:0}
+  .inline-login {padding:20px;flex-direction:column;justify-content:flex-start}
+  .cnx-login-story {width:100%;max-width:430px;min-height:190px;padding:24px;border-radius:18px 18px 0 0;flex-shrink:0}
+  .cnx-login-story h2 {font-size:22px;margin-bottom:0}.cnx-login-story p,.cnx-login-tags {display:none}
+  .cnx-login-story::after {background:linear-gradient(90deg,#102f50e8,#102f5050)}
+  .inline-login .il-card {min-height:0;padding:25px;border-radius:0 0 18px 18px;flex-shrink:0}
+  .il-brand .il-logo {width:70px;height:70px}.il-brand h1 {font-size:23px}
+  .cnx-hero {min-height:0;padding:23px 20px;border-radius:13px;margin-bottom:16px}
+  .cnx-hero-art {left:15%;opacity:.35}.cnx-hero::before {background:linear-gradient(90deg,#102f50f5,#102f5088)}
+  .cnx-hero-copy {max-width:100%;padding-top:22px}.cnx-hero h3 {font-size:22px}.cnx-hero p {font-size:12px}
+  .cnx-eyebrow {font-size:9px;letter-spacing:1.5px}.cnx-hero-actions {gap:8px;margin-top:14px}
+  .cnx-hero-actions button {min-height:44px}.cnx-compact .cnx-hero-copy {max-width:100%}.cnx-hero.cnx-compact {padding:20px}
+}
+@media(prefers-reduced-motion:reduce) {.cnx-scan,.cnx-value-updated {animation:none}.metric-card,.cnx-hero-actions button {transition:none}.metric-card:hover {transform:none}}
+@media print {.cnx-hero,.cnx-login-story {display:none}.metric-card {box-shadow:none;transform:none}}

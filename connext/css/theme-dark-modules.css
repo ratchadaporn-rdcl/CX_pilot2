@@ -1,0 +1,115 @@
+/* CONNEXT — css/theme-dark-modules.css : โหมดมืดของหน้าโมดูล (lib/ui.php · admin · PO · IC · bypass) (2026-10-08 · สร้างโดย connext-local/patches/2026-10-08-dark-theme-addons/gen_dark_addons.py)
+ * มีผลเฉพาะ html[data-theme="dark"] · สีจากตัวแปรใน css/inventory-theme.css · ห้ามแก้มือ — แก้ต้นฉบับแล้วสร้างใหม่ + ทับด้วย theme-dark-fixes */
+
+/* ---- lib/ui.php ---- */
+html:where([data-theme="dark"]) .box{background:var(--surface)}
+html:where([data-theme="dark"]) .topbar .logo{color:var(--on-action)}
+html:where([data-theme="dark"]) :where(input[readonly]){background:var(--surface-soft)}
+html:where([data-theme="dark"]) :where(input[type=file])::file-selector-button{background:var(--surface-soft)}
+html:where([data-theme="dark"]) button.ghost:not(:disabled):hover{background:var(--info-bg)}
+html:where([data-theme="dark"]) .b-ok{border-color:var(--border)}
+html:where([data-theme="dark"]) .b-bad{border-color:var(--error-text)}
+html:where([data-theme="dark"]) .b-info{background:var(--surface-soft);color:var(--info-text);border-color:var(--border)}
+html:where([data-theme="dark"]) .alert.warn{background:var(--warn-bg);color:var(--warn-text)}
+html:where([data-theme="dark"]) .alert.warn>i{color:var(--warn-text)}
+html:where([data-theme="dark"]) .alert.info{background:var(--surface-soft);border-color:var(--border);color:var(--info-text)}
+html:where([data-theme="dark"]) .alert.ok{background:var(--info-bg);border-color:var(--border);color:var(--info-text)}
+html:where([data-theme="dark"]) .alert.ok>i{color:var(--info-text)}
+html:where([data-theme="dark"]) .alert.bad{background:var(--error-bg);border-color:var(--error-text);color:var(--error-text)}
+html:where([data-theme="dark"]) .alert.bad>i{color:var(--error-text)}
+html:where([data-theme="dark"]) :where(th){background:var(--surface-soft);color:var(--text-main)}
+html:where([data-theme="dark"]) .step{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .step .t b{color:var(--on-action)}
+html:where([data-theme="dark"]) .backbar a:hover{background:var(--info-bg)}
+/* ---- admin.php ---- */
+html:where([data-theme="dark"]) .tbl tr.edit-row>td{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .qty-warn{color:var(--warn-text)}
+/* ---- bypass.php ---- */
+html:where([data-theme="dark"]) .bp-ph-add.need{border-color:var(--error-text)}
+html:where([data-theme="dark"]) .bp-avail.low{color:var(--error-text)}
+/* ---- ic_new.php ---- */
+html:where([data-theme="dark"]) .sw .track{background:var(--info-bg)}
+html:where([data-theme="dark"]) .ccnote.same{border-color:var(--border)}
+html:where([data-theme="dark"]) .ccnote.lock{background:var(--surface-soft);border-color:var(--border);color:var(--info-text)}
+html:where([data-theme="dark"]) .seg[data-k=size].on b{background:var(--warn-bg)}
+html:where([data-theme="dark"]) .seg[data-k=brand].on b{background:var(--error-bg);border-color:var(--error-text)}
+html:where([data-theme="dark"]) .seg[data-k=unit].on b{background:var(--info-bg);border-color:var(--border)}
+html:where([data-theme="dark"]) .seg[data-k=extra].on b{background:var(--info-bg);border-color:var(--border)}
+html:where([data-theme="dark"]) .pick-list{background:var(--surface)}
+html:where([data-theme="dark"]) .pick-sec{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .pk .c{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .pk .u{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .pk .u.bad{border-color:var(--error-text)}
+html:where([data-theme="dark"]) .mg-card{border-color:var(--border);background:var(--surface)}
+html:where([data-theme="dark"]) .llp-find{background:var(--surface-soft);border-color:var(--border)}
+/* ---- llp_master.php ---- */
+html:where([data-theme="dark"]) tr.warnrow td{background:var(--warn-bg)}
+/* ---- mango_bal.php ---- */
+html:where([data-theme="dark"]) .mb-chip.go{border-color:var(--border)}
+html:where([data-theme="dark"]) tfoot td{background:var(--surface-soft)}
+/* ---- po.php ---- */
+html:where([data-theme="dark"]) .addm{color:var(--warn-text)}
+html:where([data-theme="dark"]) .dropzone .dz-file{border-color:var(--border)}
+/* ---- rc.php ---- */
+html:where([data-theme="dark"]) .ccbox{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .bcard{background:var(--surface)}
+html:where([data-theme="dark"]) .bcard .hd .x{background:var(--surface)}
+html:where([data-theme="dark"]) .slot{background:var(--surface)}
+html:where([data-theme="dark"]) .slot:hover{background:var(--surface)}
+html:where([data-theme="dark"]) .slot.filled{border-color:var(--border)}
+html:where([data-theme="dark"]) .alloc .rm{background:var(--surface)}
+html:where([data-theme="dark"]) .icp{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-hd{color:var(--on-action)}
+html:where([data-theme="dark"]) .icp-x{border-color:var(--border)}
+html:where([data-theme="dark"]) .icp-top{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-q{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-clear{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-back{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-sec .dot.b{background:var(--border)}
+html:where([data-theme="dark"]) .icp-row{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-row .c{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-row.cur .c{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-row.cur .sub{color:var(--info-text)}
+html:where([data-theme="dark"]) .icp-row .u{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-primary{color:var(--on-action)}
+html:where([data-theme="dark"]) .icp-primary:disabled{background:var(--info-bg)}
+html:where([data-theme="dark"]) .icp-rail{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-step:hover{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-step.on{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-step .k{background:var(--info-bg)}
+html:where([data-theme="dark"]) .icp-step.on .k{color:var(--on-action)}
+html:where([data-theme="dark"]) .icp-addbtn{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-addbtn[disabled]{color:var(--text-muted)}
+html:where([data-theme="dark"]) .icp-addrow{border-bottom-color:var(--warn-text)}
+html:where([data-theme="dark"]) .icp-addrow input{border-color:var(--warn-text);background:var(--surface)}
+html:where([data-theme="dark"]) .icp-o .c{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-o.cur .c{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-note.info{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-note.warn{border-color:var(--error-text)}
+html:where([data-theme="dark"]) .icp-note.good{border-color:var(--border)}
+html:where([data-theme="dark"]) .icp-ccset select{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-ft{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-sg b{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-sg.empty b{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-kb kbd{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .icp-status.ok{color:var(--info-text)}
+html:where([data-theme="dark"]) .icp-2nd{background:var(--surface)}
+html:where([data-theme="dark"]) .icp-2nd:disabled{color:var(--text-muted)}
+html:where([data-theme="dark"]) .hist tr.void td{background:var(--error-bg)}
+html:where([data-theme="dark"]) .dn-box.miss{border-color:var(--error-text);background:var(--error-bg)}
+html:where([data-theme="dark"]) .dn-th{background:var(--surface)}
+/* ---- setup_master.php ---- */
+html:where([data-theme="dark"]) tr.warnrow td{background:var(--warn-bg)}
+html:where([data-theme="dark"]) .splittbl .splitrow.first td{border-top-color:var(--border)}
+html:where([data-theme="dark"]) .splittbl tr.badsum td{background:var(--error-bg)}
+html:where([data-theme="dark"]) .splittbl tr.oksum td{background:var(--info-bg)}
+html:where([data-theme="dark"]) .ccbox{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .ccbox.bad{border-color:var(--error-text)}
+html:where([data-theme="dark"]) .ccbox.good{border-color:var(--border)}
+html:where([data-theme="dark"]) .smp{background:var(--surface)}
+html:where([data-theme="dark"]) .smp-hd{color:var(--on-action)}
+html:where([data-theme="dark"]) .smp-x{border-color:var(--border)}
+html:where([data-theme="dark"]) .smp-tabs{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .smr .c{background:var(--surface-soft)}
+html:where([data-theme="dark"]) .smr .u{background:var(--surface-soft)}
+html:where([data-theme="dark"]) #smpStatus.ok{color:var(--info-text)}

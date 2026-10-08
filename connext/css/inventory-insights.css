@@ -1,0 +1,265 @@
+/*
+ * CONNEXT — css/inventory-insights.css  [PHP port 2026-09-24 · มติ 49]
+ * Dashboard คลัง: สลับมุมมอง "ภาพรวมสต๊อก | ตั้ง Min-Max" · การ์ดวัสดุยอดนิยม · การ์ด Min-Max · ตารางกรอก Min-Max
+ * ตารางกรอกใช้คลาส .rate-* ชุดเดียวกับ "ตั้งราคาหักเงิน" (หน้าตาเหมือนกัน) — ไฟล์นี้เพิ่มเฉพาะส่วนที่ต่าง
+ * คู่กับ js/inventory-insights.js · ไม่มีใน GAS — build index.php ใหม่ต้องเติม <link>/<script> กลับ
+ */
+
+/* ---------- สลับมุมมอง ---------- */
+.ii-viewtabs {
+    display: inline-flex; gap: 4px; padding: 4px; margin: 0 0 1rem; border-radius: 14px;
+    background: #e2e8f0; max-width: 100%;
+}
+.ii-vt {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px;
+    border: 0; border-radius: 11px; background: transparent; color: var(--text-muted);
+    font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+.ii-vt.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.14); }
+.ii-vt .ii-vt-badge {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #fff;
+    font-size: 0.72rem; font-weight: 700; line-height: 20px; text-align: center;
+}
+.ii-vt .ii-vt-badge[hidden] { display: none; }
+
+/* ---------- การ์ดบนภาพรวม ---------- */
+.ii-row { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+@media (min-width: 1000px) { .ii-row { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+.ii-card {
+    background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+    padding: 1rem 1.1rem; min-width: 0; display: flex; flex-direction: column;
+}
+.ii-head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.75rem; margin-bottom: 0.6rem; }
+.ii-head h3 { display: flex; align-items: center; gap: 0.5rem; font-size: 1.02rem; font-weight: 700; color: var(--secondary); margin: 0; }
+.ii-head h3 > i { color: var(--primary); }
+.ii-head .ii-site { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); background: #f1f5f9; padding: 2px 9px; border-radius: 999px; }
+.ii-head .ii-end { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+.ii-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ii-chip {
+    padding: 5px 12px; border: 1px solid var(--border); background: #fff; border-radius: 999px; font: inherit;
+    font-size: 0.8rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+}
+.ii-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+.ii-note { font-size: 0.76rem; color: var(--text-muted); line-height: 1.5; }
+.ii-sub { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; margin-bottom: 0.5rem; }
+.ii-chart { position: relative; width: 100%; min-width: 0; }
+/* Chart.js ใส่ความกว้างเป็น px ลงบน canvas — หมุนจอ/ย่อจอแล้ว canvas เก่าห้ามดันหน้าให้กว้างเกินจอ */
+.ii-chart > canvas { max-width: 100%; }
+.ii-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center;
+            padding: 1.6rem 1rem; color: var(--text-muted); font-size: 0.88rem; border: 1px dashed var(--border); border-radius: 12px; }
+.ii-empty i { font-size: 1.6rem; opacity: 0.7; }
+.ii-link-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(30, 58, 138, 0.25);
+    border-radius: 10px; background: rgba(59, 130, 246, 0.06); color: var(--primary); font: inherit; font-size: 0.84rem;
+    font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.ii-link-btn:hover { background: rgba(59, 130, 246, 0.12); }
+
+/* การ์ด Min-Max */
+.ii-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 0.75rem; }
+.ii-stat {
+    border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem 0.4rem; text-align: center; background: #f8fafc;
+    cursor: pointer; font: inherit; color: inherit;
+}
+.ii-stat .v { font-size: 1.25rem; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.ii-stat .l { font-size: 0.7rem; color: var(--text-muted); line-height: 1.25; margin-top: 2px; }
+.ii-stat.low  .v { color: #dc2626; }
+.ii-stat.over .v { color: #7c3aed; }
+.ii-stat.ok   .v { color: #16a34a; }
+.ii-stat.unset .v { color: var(--text-muted); }
+.ii-list { display: flex; flex-direction: column; gap: 6px; }
+.ii-li {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; text-align: left;
+    padding: 0.55rem 0.7rem; border: 1px solid var(--border); border-radius: 12px; background: #fff; cursor: pointer;
+    font: inherit; color: inherit; width: 100%;
+}
+.ii-li:hover { border-color: rgba(59, 130, 246, 0.4); }
+.ii-li .n { font-weight: 600; font-size: 0.9rem; color: var(--secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ii-li .c { font-family: ui-monospace, Menlo, monospace; font-size: 0.72rem; color: var(--primary); }
+.ii-li .q { grid-row: 1 / span 2; grid-column: 2; text-align: right; font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+.ii-li .q b { display: block; font-size: 0.95rem; color: #b45309; }
+.ii-li .bar { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: #f1f5f9; overflow: hidden; margin-top: 4px; }
+.ii-li .bar > span { display: block; height: 100%; border-radius: 999px; background: #ef4444; }
+.ii-hint {
+    display: flex; gap: 10px; align-items: flex-start; padding: 0.75rem 0.85rem; border-radius: 12px;
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.86rem; line-height: 1.55; margin-bottom: 0.7rem;
+}
+.ii-hint > i { margin-top: 3px; color: #2563eb; }
+.ii-foot { margin-top: auto; padding-top: 0.6rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ---------- มุมมอง "ตั้ง Min-Max" ---------- */
+#iiMinMax[hidden], #iiOverview[hidden] { display: none; }
+/* select ไซต์กว้างตามชื่อไซต์ที่ยาวที่สุด (~550px) — จำกัดไว้ ไม่งั้นมือถือล้นจอ */
+#iiMmSiteSel { width: auto; min-width: 170px; max-width: 300px; text-overflow: ellipsis; }
+.ii-mm-wrap { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 1rem 1.1rem; }
+.ii-params { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 0.8rem; background: #f8fafc; }
+.ii-params > summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0.65rem 0.85rem;
+    font-weight: 600; font-size: 0.9rem; color: var(--secondary);
+}
+.ii-params > summary::-webkit-details-marker { display: none; }
+.ii-params > summary .ii-sum-note { font-weight: 400; font-size: 0.8rem; color: var(--text-muted); }
+.ii-params > summary .fa-chevron-down { margin-left: auto; transition: transform 0.2s ease; color: var(--text-muted); }
+.ii-params[open] > summary .fa-chevron-down { transform: rotate(180deg); }
+.ii-params-body { padding: 0 0.85rem 0.85rem; }
+.ii-params-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; margin-bottom: 0.6rem; }
+.ii-params-grid label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; }
+.ii-params-grid .form-control { width: 100%; }
+.ii-formula { font-size: 0.8rem; line-height: 1.7; color: var(--text-muted); background: #fff; border: 1px dashed var(--border);
+              border-radius: 10px; padding: 0.55rem 0.75rem; margin-bottom: 0.6rem; }
+.ii-formula b { color: var(--secondary); }
+.ii-params-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ii-params-actions .btn { width: auto; min-height: 40px; padding: 0.45rem 0.9rem; font-size: 0.88rem; }
+.ii-readonly { display: flex; align-items: center; gap: 8px; padding: 0.55rem 0.8rem; margin-bottom: 0.7rem; border-radius: 10px;
+               background: #f1f5f9; color: var(--text-muted); font-size: 0.85rem; }
+.rate-summary-chip.over { background: #ede9fe; color: #6d28d9; }
+.rate-summary-chip.low  { background: #fee2e2; color: #b91c1c; }
+
+/* ตาราง: ใช้ .rate-table เดิม + คอลัมน์ Min-Max */
+.ii-mm-table thead th.num, .ii-mm-table td.num { text-align: right; white-space: nowrap; }
+.ii-mm-table thead th.mm { text-align: center; width: 104px; }
+.ii-mm-table td.mm { text-align: center; }
+.ii-mm-table .ii-mm-input { width: 92px; text-align: right; }
+.ii-mm-table .ii-mm-input.bad { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15); }
+.ii-mm-table .ii-small { display: block; font-size: 0.74rem; color: var(--text-muted); font-weight: 400; white-space: nowrap; }
+.ii-mm-table .ii-sug { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ii-mm-table .ii-sug b { color: var(--secondary); }
+.ii-use-btn {
+    margin-left: 6px; padding: 2px 9px; border: 1px solid rgba(30, 58, 138, 0.3); border-radius: 8px; background: #fff;
+    color: var(--primary); font: inherit; font-size: 0.74rem; font-weight: 600; cursor: pointer; vertical-align: middle;
+}
+.ii-use-btn:hover { background: rgba(59, 130, 246, 0.08); }
+.ii-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.ii-pill.low   { background: #fee2e2; color: #b91c1c; }
+.ii-pill.over  { background: #ede9fe; color: #6d28d9; }
+.ii-pill.ok    { background: #dcfce7; color: #15803d; }
+.ii-pill.unset { background: #f1f5f9; color: var(--text-muted); font-weight: 600; }
+.ii-order { display: block; margin-top: 3px; font-size: 0.72rem; font-weight: 600; color: #b45309; white-space: nowrap; }
+.ii-mm-table tr.ii-row-low td:first-child { box-shadow: inset 4px 0 0 #ef4444; }
+.ii-mm-table tr.ii-row-over td:first-child { box-shadow: inset 4px 0 0 #8b5cf6; }
+
+/* ---------- มุมมอง "Error log" ---------- */
+#iiErrors[hidden] { display: none; }
+.ii-vt[hidden] { display: none; }
+.ii-vt-short { display: none; }
+.ii-check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+.ii-check input { width: 18px; height: 18px; accent-color: var(--primary); }
+.ii-ecats { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+.ii-ecat {
+    display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 0.75rem 0.85rem; border: 1px solid var(--border);
+    border-left: 5px solid var(--ec, #64748b); border-radius: 12px; background: #fff; cursor: pointer; font: inherit; color: inherit;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.ii-ecat:hover { border-color: var(--ec, #64748b); }
+.ii-ecat.active { background: #f8fafc; box-shadow: 0 0 0 2px var(--ec, #64748b); }
+.ii-ecat-head { display: flex; align-items: center; gap: 8px; }
+.ii-ecat-head > i { color: var(--ec, #64748b); width: 1.1em; text-align: center; }
+.ii-ecat-head .lbl { flex: 1; font-weight: 700; font-size: 0.92rem; color: var(--secondary); line-height: 1.3; }
+.ii-ecat-head .cnt { font-size: 1.3rem; font-weight: 800; color: var(--ec, #64748b); font-variant-numeric: tabular-nums; }
+.ii-ecat-last { font-size: 0.74rem; color: var(--text-muted); }
+.ii-etops { display: flex; flex-wrap: wrap; gap: 4px; }
+.ii-etop { font-family: ui-monospace, Menlo, monospace; font-size: 0.72rem; padding: 1px 7px; border-radius: 6px; background: #f1f5f9; color: var(--secondary); }
+.ii-etop b { font-family: inherit; color: var(--ec, #64748b); }
+.ii-ecat-advice { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+.ii-er-chartcard { margin-bottom: 1rem; box-shadow: none; border: 1px solid var(--border); }
+.ii-er-listbar { margin-top: 0; }
+.ii-echip {
+    display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; white-space: nowrap;
+    font-size: 0.74rem; font-weight: 700; color: var(--ec, #64748b);
+    background: #f1f5f9;                                                     /* เบราว์เซอร์เก่าที่ไม่รู้จัก color-mix */
+    background: color-mix(in srgb, var(--ec, #64748b) 12%, #fff);
+}
+.ii-er-table td { vertical-align: top; }
+.ii-er-table .ii-er-time { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: 0.84rem; }
+.ii-er-table .ii-er-gate { font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem; white-space: nowrap; }
+.ii-er-table .ii-er-msg { word-break: break-word; font-size: 0.86rem; line-height: 1.5; }
+.ii-etags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.ii-etag { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; background: #eef2f7; color: var(--secondary); font-size: 0.74rem; }
+.ii-etag i { color: var(--text-muted); font-size: 0.7rem; }
+.ii-er-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 0.6rem; }
+
+/* ---------- Dashboard เดิม: ป้ายสถานะตาม Min-Max + กล่องในหน้ารายละเอียดวัสดุ ---------- */
+.ii-badge { display: inline-block; color: #fff; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
+.ii-badge.low  { background: #f97316; }
+.ii-badge.over { background: #8b5cf6; }
+.ii-badge.ok   { background: #10b981; }
+.ii-badge-sub  { display: block; margin-top: 2px; font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
+.ii-md-box { border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; background: #f8fafc; }
+.ii-md-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ii-md-grid > div { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; text-align: center; }
+.ii-md-grid .l { font-size: 0.7rem; color: var(--text-muted); }
+.ii-md-grid .v { font-size: 1.02rem; font-weight: 800; color: var(--secondary); font-variant-numeric: tabular-nums; }
+.ii-md-note { margin-top: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+.ii-md-note b { color: #b45309; }
+
+/* ---------- มือถือ ---------- */
+@media (max-width: 768px) {
+    .ii-viewtabs { display: flex; width: 100%; }
+    .ii-vt { flex: 1 1 0; gap: 6px; padding: 0 6px; font-size: 0.84rem; min-height: 46px; min-width: 0; }
+    .ii-vt-long { display: none; }
+    .ii-vt-short { display: inline; }
+    .ii-ecats { grid-template-columns: 1fr; }
+    .ii-card, .ii-mm-wrap { padding: 0.85rem; border-radius: 16px; }
+    .ii-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+    /* แท็บ 4 อัน (ภาพรวม · Min-Max · รอบจ่าย · Error) บนจอแคบ — ตัดไอคอน เหลือชื่อ + ตัวเลข */
+    .ii-vt > i { display: none; }
+    .ii-vt { gap: 4px; padding: 0 4px; }
+    .ii-vt .ii-vt-badge { min-width: 18px; padding: 0 5px; }
+}
+@media (max-width: 640px) {
+    /* ตารางกรอก → การ์ดทีละวัสดุ (แบบเดียวกับรายการร่างของหน้าเบิก) */
+    .ii-mm-table, .ii-mm-table thead, .ii-mm-table tbody, .ii-mm-table tr, .ii-mm-table td { display: block; width: 100%; }
+    .ii-mm-table thead { display: none; }
+    .rate-table-wrap.ii-mm-tw { border: 0; overflow: visible; }
+    .ii-mm-table tr.rate-grp-row td { border-radius: 10px; margin: 0.8rem 0 0.4rem; border: 0; }
+    .ii-mm-table tr.rate-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; padding: 0.7rem 0.8rem; margin-bottom: 0.55rem;
+        border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    .ii-mm-table tr.rate-row td { border: 0; padding: 0; background: transparent !important; box-shadow: none !important; }
+    .ii-mm-table tr.rate-row td[data-label]::before {
+        content: attr(data-label); display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 500; margin-bottom: 2px;
+    }
+    .ii-mm-table td.ii-td-name { grid-column: 1 / -1; order: -2; }
+    .ii-mm-table td.rate-td-code { grid-column: 1; order: -1; align-self: center; }
+    .ii-mm-table td.ii-td-status { grid-column: 2; order: -1; text-align: right; }
+    .ii-mm-table td.num { text-align: left; }
+    .ii-mm-table td.ii-td-sug { grid-column: 1 / -1; }
+    .ii-mm-table td.mm { text-align: left; }
+    .ii-mm-table .ii-mm-input { width: 100%; min-height: 46px; font-size: 16px; }
+    .ii-mm-table tr.rate-row.rate-dirty { background: #fef9e7; }
+    .ii-mm-table tr.ii-row-low  { box-shadow: inset 4px 0 0 #ef4444, 0 1px 3px rgba(15, 23, 42, 0.06); }
+    .ii-mm-table tr.ii-row-over { box-shadow: inset 4px 0 0 #8b5cf6, 0 1px 3px rgba(15, 23, 42, 0.06); }
+    .ii-mm-table tr.ii-row-low td:first-child, .ii-mm-table tr.ii-row-over td:first-child { box-shadow: none; }
+    .ii-mm-toolbar .rate-site-box { flex: 1 1 100%; min-width: 0; }
+    #iiMmSiteSel { flex: 1 1 auto; width: 100%; min-width: 0; max-width: none; }
+    .ii-mm-toolbar .rate-search-box { flex-basis: 100%; }
+    .ii-mm-toolbar #iiMmFilter { flex: 1 1 100%; width: 100% !important; }
+    .ii-mm-toolbar .btn, .ii-mm-toolbar .rate-only-btn { flex: 1 1 auto; justify-content: center; }
+    .ii-mm-savebar {
+        position: sticky; bottom: 0; z-index: 40; margin: 0.8rem -0.85rem -0.85rem; padding: 0.65rem 0.85rem calc(0.65rem + env(safe-area-inset-bottom, 0px));
+        background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.06);
+        border-radius: 0 0 16px 16px;
+    }
+    .ii-mm-savebar .btn { width: 100%; min-height: 52px; font-size: 1rem; }
+
+    /* Error log: แถว → การ์ด */
+    .ii-er-table, .ii-er-table thead, .ii-er-table tbody, .ii-er-table tr, .ii-er-table td { display: block; width: 100%; }
+    .ii-er-table thead { display: none; }
+    .rate-table-wrap.ii-er-tw { border: 0; overflow: visible; }
+    .ii-er-table tr.rate-row {
+        display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 10px; padding: 0.65rem 0.8rem;
+        margin-bottom: 0.5rem; border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    .ii-er-table tr.rate-row td { border: 0; padding: 0; width: auto; min-width: 0; background: transparent !important; }
+    /* แถว 1: เวลา · ประตู — แถว 2: ประเภท (ชื่อยาวได้) — แถว 3: ข้อความ */
+    .ii-er-table td.ii-er-cat { grid-column: 1 / -1; justify-self: start; }
+    .ii-er-table .ii-echip { white-space: normal; }
+    .ii-er-table td.ii-er-msg { grid-column: 1 / -1; }
+    .ii-er-listbar #iiErCat, .ii-er-listbar #iiErGate { flex: 1 1 45%; width: auto !important; }
+    #iiErrors .ii-mm-toolbar .ii-chips { flex: 1 1 100%; }
+}
+@media (min-width: 641px) { .ii-mm-savebar { display: none; } }

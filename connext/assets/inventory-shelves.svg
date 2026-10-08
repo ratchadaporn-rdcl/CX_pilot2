@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" fill="none">
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0v32" stroke="#fff" stroke-opacity=".045"/></pattern>
+    <pattern id="barcode" width="22" height="18" patternUnits="userSpaceOnUse"><path d="M2 0v18m4-18v18m3-18v18m5-18v18m4-18v18" stroke="#102f50" stroke-width="2"/></pattern>
+    <linearGradient id="box" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7f4e5"/><stop offset="1" stop-color="#d6dfdf"/></linearGradient>
+    <g id="crate"><rect width="94" height="72" rx="4" fill="url(#box)"/><path d="M38 0h18v21H38z" fill="#ffda4d"/><rect x="12" y="43" width="28" height="18" rx="2" fill="#fff"/><rect x="15" y="45" width="22" height="14" fill="url(#barcode)"/><path d="M64 51h18m-18 6h12" stroke="#102f50" stroke-opacity=".3" stroke-width="2"/></g>
+  </defs>
+  <rect width="720" height="400" rx="16" fill="#102f50"/><rect width="720" height="400" fill="url(#grid)"/>
+  <path d="M75 354h584" stroke="#ffda4d" stroke-opacity=".3"/>
+  <path d="M160 68v286M651 68v286M395 68v286" stroke="#ffda4d" stroke-width="9"/>
+  <path d="M147 148h516M147 247h516M147 346h516" stroke="#e3e6e4" stroke-width="9"/>
+  <use href="#crate" x="177" y="71"/><use href="#crate" x="283" y="71"/><use href="#crate" x="413" y="71"/><use href="#crate" x="519" y="71"/>
+  <use href="#crate" x="177" y="170"/><use href="#crate" x="283" y="170"/><use href="#crate" x="413" y="170"/><use href="#crate" x="519" y="170"/>
+  <use href="#crate" x="177" y="269"/><use href="#crate" x="283" y="269"/><use href="#crate" x="413" y="269"/><use href="#crate" x="519" y="269"/>
+  <rect x="283" y="170" width="94" height="72" rx="4" fill="#b82029"/><path d="M321 170h18v21h-18" fill="#ffda4d"/><path d="M322 211l8-15 8 15z" fill="#ffda4d"/><path d="M330 200v5m0 2v2" stroke="#102f50" stroke-width="2"/>
+  <rect x="61" y="225" width="162" height="115" rx="12" fill="#091a2c" stroke="#ffda4d" stroke-width="2"/>
+  <path d="M78 246h84m-84 9h49" stroke="#e3e6e4" stroke-opacity=".6" stroke-width="3"/>
+  <path d="M80 316v-27m23 27v-43m23 43v-33m23 33v-49m23 49v-38m23 38v-57" stroke="#ffda4d" stroke-width="10"/>
+  <path d="M488 25h134" stroke="#ffda4d" stroke-opacity=".45" stroke-width="2" stroke-dasharray="5 6"/>
+  <circle cx="476" cy="25" r="5" fill="#ffda4d"/><path d="M640 20l5 5-5 5" stroke="#ffda4d" stroke-width="2"/>
+</svg>
