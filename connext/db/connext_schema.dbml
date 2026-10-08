@@ -1,0 +1,507 @@
+// ============================================================
+// CONNEXT — Database Schema v1.0 (DBML)
+// ระบบเบิกจ่ายวัสดุ + ประตูคลัง + ใบหักเงิน (port จาก Google Apps Script)
+// ที่มา: db/db_setup.sql — MySQL 5.7+ / MariaDB 10.4+ · utf8mb4 · InnoDB
+//
+// วางใน https://dbdiagram.io  หรือ  https://dbdocs.io  ได้ทันที
+// คอมเมนต์ // Sheet.Col = ที่มาจาก Google Sheet เดิม
+// ============================================================
+
+Project connext {
+  database_type: 'MySQL'
+  Note: '''
+  CONNEXT — 21 ตาราง, normalize จาก Google Sheet เดิม 18 ชีต
+  โครงสร้างหลัก: projects เป็นแกน (transactional ทุกตัว FK มาที่นี่)
+  documents = หัวเอกสาร 4 ชนิด (RD/OD/BD/IN) แยก header + items
+  '''
+}
+
+// ------------------------------------------------------------
+// Enums (เดิมเป็น ENUM inline ใน MySQL)
+// ------------------------------------------------------------
+Enum project_status {
+  active
+  archived
+}
+
+Enum account_status {
+  active
+  inactive
+}
+
+Enum doc_type {
+  RD [note: 'Requisition — เบิกวัสดุ']
+  OD [note: 'Odds — เศษ/ปลีก']
+  BD [note: 'Borrow/Return — ยืม-คืน']
+  IN [note: 'Inbound — รับเข้า']
+}
+
+Enum gate_leg {
+  "out"
+  "return"
+}
+
+Enum remember_account_type {
+  user
+  subcontractor
+}
+
+// ============================================================
+// MASTER / มิติ
+// ============================================================
+
+Table projects [headercolor: #6c8ebf] {
+  id         int          [pk, increment]
+  code       varchar(20)  [not null, unique, note: 'Sites.SiteCode เช่น ARI']
+  name       varchar(150) [not null]
+  site_ref   varchar(50)  [null, note: 'Sites.SiteID อ้างอิงภายนอก MANGO']
+  status     project_status [not null, default: 'active']
+  created_at timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+  Note: 'โครงการ/ไซต์ — เดิมชีต Sites'
+}
+
+Table roles [headercolor: #6c8ebf] {
+  id              int          [pk, increment]
+  role_code       varchar(20)  [not null, unique, note: 'RoleID เช่น AST, ST1']
+  name            varchar(100) [not null]
+  level           tinyint      [not null, default: 1, note: 'RoleLevel 0-12']
+  can_req         tinyint(1)   [not null, default: 0, note: 'เห็น QR/ถ่ายรูปทั้ง site']
+  can_daily_check tinyint(1)   [not null, default: 0, note: 'เมนูตรวจสอบประจำวัน']
+  created_at      timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at      timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+  Note: 'บทบาท ~40 ตำแหน่ง — เดิมชีต Roles'
+}
+
+Table users [headercolor: #6c8ebf] {
+  id         int          [pk, increment]
+  username   varchar(100) [not null, unique, note: 'case-insensitive ผ่าน collation']
+  password   varchar(255) [not null, note: 'bcrypt password_hash()']
+  emp_code   varchar(20)  [null, note: 'Users.UserID รหัสพนักงาน']
+  full_name  varchar(150) [not null, default: '']
+  role_id    int          [not null]
+  project_id int          [not null, note: 'site ปัจจุบัน (R0 สลับได้)']
+  card_id    varchar(50)  [null, note: 'บัตร RFID ประตูคลัง']
+  status     account_status [not null, default: 'active']
+  created_at timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    project_id [name: 'idx_users_project']
+    card_id    [name: 'idx_users_card']
+  }
+  Note: 'พนักงาน — เดิมชีต Users'
+}
+
+Table subcontractors [headercolor: #6c8ebf] {
+  id                int          [pk, increment]
+  sub_code          varchar(10)  [not null, note: 'SubID ใช้เป็น username login, เก็บ 3 หลัก 002']
+  password          varchar(255) [not null, note: 'bcrypt']
+  name              varchar(150) [not null, note: 'SubName = ค่า Receiver ในเอกสาร']
+  project_id        int          [not null]
+  status            account_status [not null, default: 'active']
+  mango_vendor_code varchar(50)  [null, note: 'ผลจับคู่ Mango']
+  mango_vendor_name varchar(150) [null]
+  created_at        timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at        timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (sub_code, project_id) [unique, name: 'uq_sub_code_project']
+    sub_code   [name: 'idx_sub_code']
+    project_id [name: 'idx_sub_project']
+    name       [name: 'idx_sub_name']
+  }
+  Note: 'ชุดผู้รับเหมา (login ได้) — เดิมชีต Subcontracts'
+}
+
+Table materials [headercolor: #6c8ebf] {
+  id            int          [pk, increment]
+  mat_code      varchar(50)  [not null, unique, note: 'MaterialsMain.MatCode']
+  name          varchar(255) [not null]
+  unit          varchar(50)  [not null, default: '']
+  cat_id        varchar(10)  [not null, default: 'C02', note: 'สำเนาจาก llp_products.cat_id (มติ 28-29) — แถว mango ไม่มีผลแล้ว']
+  char_id       varchar(10)  [null, note: 'สำเนาจาก llp_products.char_id — CSB/BRB/NAR/WMS']
+  subgroup_name varchar(150) [null]
+  item_photo    varchar(500) [null]
+  created_at    timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at    timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    cat_id
+    char_id
+    subgroup_name
+  }
+  Note: '''
+  วัสดุ master กลาง — เดิม MaterialsMain · code_type: mango = ทะเบียน MANGO · ic = รหัส IC ที่ออกจากบันได LLP
+  ⚠ ไฟล์นี้เป็น schema v1.0 (21 ตาราง) — ตารางบันได IC (l1_groups/l2_categories/llp_products/ic_items ฯลฯ)
+  และตารางที่เพิ่มภายหลังดูใน db/db_setup.sql · CatID/CharID ต้นทางจริงอยู่ที่ llp_products (มติ 28-29)
+  การผูกรหัส Mango → IC อยู่ตาราง mango_ic_map (มติ 40/41)
+  '''
+}
+
+Table mango_ic_map [headercolor: #6c8ebf] {
+  id         int         [pk, increment]
+  mat_code   varchar(50) [not null, note: 'materials.mat_code (code_type = mango)']
+  llp_code   char(8)     [not null, default: '', note: 'llp_products.llp_code — ขั้น 1 ของการผูก']
+  ic_code    char(20)    [not null, default: '', note: "ic_items.ic_code — '' = ยังไม่ออกรหัส IC (ยังอยู่ขั้น 1)"]
+  is_primary tinyint(1)  [not null, default: 0, note: 'แถวหลัก — รับบรรทัดเอกสารเดิม/ราคาที่ล็อก และได้ยอดทั้งก้อนโดยปริยาย']
+  mapped_by  int         [null, note: 'users.id']
+  mapped_at  datetime    [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (mat_code, llp_code, ic_code) [unique]
+    llp_code
+    ic_code
+  }
+  Note: 'มติ 40-45 — ผูก Mango → LLP → IC (1 Mango มี LLP ตัวเดียว · 1 LLP หลาย Mango/หลาย IC · 1 Mango หลาย IC ได้ใต้ LLP ของมัน) ที่หน้า setup_master.php · ข้อมูลตั้งต้นจากไฟล์ "สร้าง LLP.xlsx" (db/import_llp_master.php) · ย้ายยอด: IC เดียวยกทั้งก้อน · หลาย IC ระบุยอดแยก'
+}
+
+Table gates [headercolor: #6c8ebf] {
+  id             int          [pk, increment]
+  gate_code      varchar(20)  [not null, note: 'GateID เช่น G01 ฝังในเลขเอกสาร']
+  name           varchar(150) [not null, default: '']
+  project_id     int          [not null]
+  hardware_close tinyint(1)   [not null, default: 0, note: '1=flow เต็ม Closed by Pi, 0=scan-flow จบที่ Confirmed']
+  status         account_status [not null, default: 'active']
+  created_at     timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at     timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (gate_code, project_id) [unique, name: 'uq_gate_project']
+  }
+  Note: 'ประตูคลังต่อโครงการ — เดิม Gates'
+}
+
+Table mango_vendors [headercolor: #6c8ebf] {
+  id          int          [pk, increment]
+  vendor_code varchar(50)  [not null, unique, note: 'MangoVendors.MangoVendorCode']
+  vendor_name varchar(150) [not null]
+  Note: 'ผู้ขายจากระบบ MANGO — เดิม MangoVendors'
+}
+
+// ============================================================
+// TRANSACTIONAL
+// ============================================================
+
+Table project_materials [headercolor: #82b366] {
+  id          int       [pk, increment]
+  project_id  int       [not null]
+  material_id int       [not null]
+  gate_id     int       [null, note: 'ประตูประจำวัสดุ']
+  created_at  timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (project_id, material_id) [unique, name: 'uq_pm']
+    material_id
+  }
+  Note: 'วัสดุที่มีในโครงการ + ประตูจ่าย — เดิม SiteMaterials'
+}
+
+Table stock_balances [headercolor: #82b366] {
+  id          int           [pk, increment]
+  project_id  int           [not null]
+  material_id int           [not null]
+  qty_in      decimal(14,3) [not null, default: 0]
+  qty_out     decimal(14,3) [not null, default: 0]
+  on_hand     decimal(14,3) [not null, default: 0, note: 'In - Out, clamp >= 0']
+  pending     decimal(14,3) [not null, default: 0, note: 'จองรออนุมัติ/รอจ่าย']
+  updated_at  timestamp     [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (project_id, material_id) [unique, name: 'uq_balance']
+    material_id
+  }
+  Note: 'ยอดสต๊อกต่อวัสดุต่อโครงการ — เดิม Balance'
+}
+
+Table documents [headercolor: #82b366] {
+  id                 int          [pk, increment]
+  doc_no             varchar(30)  [not null, unique, note: 'RD130526G01 = TYPE+DDMMYY+XX+G{n}']
+  doc_type           doc_type     [not null]
+  project_id         int          [not null]
+  requester_username varchar(100) [not null, note: 'user หรือ subcontractor']
+  receiver_name      varchar(150) [null, note: 'SubName หรือ DC:ชื่อ verbatim']
+  receiver_sub_id    int          [null, note: 'resolve แล้ว, NULL = DC/อื่น']
+  gate_id            int          [null]
+  usage_area         varchar(150) [null, note: 'สำเนาแถวแรก, ค่าจริงอยู่ document_items']
+  notice             text         [null, note: 'สำเนาแถวแรก']
+  approver_username  varchar(100) [null, note: 'ว่าง = ใครก็ได้ที่ role ถึง']
+  approved_by        varchar(100) [null, note: 'ผู้กดอนุมัติจริง (audit)']
+  status             varchar(30)  [not null, note: 'Awaiting approval/Approved/Completed/Cancelled/Rejected/Sent Borrow/Borrowed/Sent Return/Returned/Sent Inbound']
+  rs_no              varchar(50)  [null]
+  photo_url          text         [null, note: 'หลาย URL คั่น comma, append ได้']
+  photo_return_url   text         [null, note: 'ขาคืน (BD)']
+  doc_ts             datetime     [not null, note: 'เวลาไทย']
+  return_ts          datetime     [null]
+  created_at         timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at         timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (project_id, doc_type, doc_ts)            [name: 'idx_doc_proj_type_ts']
+    (project_id, status)                      [name: 'idx_doc_proj_status']
+    (project_id, requester_username, doc_ts)  [name: 'idx_doc_proj_requester']
+    requester_username                        [name: 'idx_doc_requester']
+    receiver_name                             [name: 'idx_doc_receiver']
+    doc_ts                                    [name: 'idx_doc_ts']
+  }
+  Note: 'หัวเอกสาร 4 ชนิด — เดิม RequisitionLogs/OddsLogs/Borrow_Return/InboundLogs'
+}
+
+Table document_items [headercolor: #82b366] {
+  id             int           [pk, increment]
+  document_id    int           [not null]
+  material_id    int           [null, note: 'NULL ได้กรณี legacy import ไม่แมตช์']
+  mat_code       varchar(50)   [not null, note: 'snapshot ณ เวลาสร้าง']
+  mat_name       varchar(255)  [not null, default: '', note: 'snapshot']
+  unit           varchar(50)   [not null, default: '', note: 'snapshot']
+  qty            decimal(14,3) [not null, default: 0]
+  usage_area     varchar(150)  [null, note: 'ต่อรายการ']
+  notice         text          [null, note: 'ต่อรายการ']
+  rs_no          varchar(50)   [null, note: 'InboundLogs.RS — คนละใบรับได้ในเอกสารเดียว']
+  charge_money   tinyint(1)    [not null, default: 0, note: 'หักเงิน ต่อรายการ']
+  stock_deducted tinyint(1)    [not null, default: 0, note: 'กันตัดสต๊อกซ้ำ']
+  created_at     timestamp     [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    document_id
+    material_id
+    charge_money
+  }
+  Note: 'รายการวัสดุในเอกสาร (grain เดิมของชีต log)'
+}
+
+Table gate_logs [headercolor: #82b366] {
+  id          int          [pk, increment]
+  project_id  int          [not null]
+  doc_no      varchar(35)  [not null, unique, note: 'DocID อาจมี suffix RT (ขาคืน)']
+  document_id int          [null, note: 'RT ก็ชี้ BD เดิม']
+  leg         gate_leg     [not null, default: 'out']
+  gate_id     int          [null]
+  picking_id  varchar(20)  [null, note: 'PK{DDMMYY}{XX}']
+  card_id     varchar(50)  [null, note: 'บัตรที่แตะ (Pi เขียน)']
+  scanned_at  datetime     [null, note: 'เวลาแตะบัตร/สแกน']
+  status      varchar(20)  [not null, default: 'Awaiting', note: 'Awaiting → Opened|Scanned → Confirmed → Closed']
+  created_at  timestamp    [default: `CURRENT_TIMESTAMP`]
+  updated_at  timestamp    [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (project_id, status) [name: 'idx_gl_proj_status']
+    picking_id           [name: 'idx_gl_picking']
+    document_id          [name: 'idx_gl_document']
+  }
+  Note: 'สถานะเอกสารที่ประตูคลัง — เดิม GateLogs (1 แถวต่อเอกสาร)'
+}
+
+Table rate_cards [headercolor: #82b366] {
+  id          int           [pk, increment]
+  project_id  int           [not null]
+  material_id int           [not null]
+  unit_price  decimal(12,4) [null, note: 'NULL = ยังไม่ตั้งราคา (ต่างจาก 0 บาท)']
+  updated_by  varchar(100)  [null]
+  updated_at  timestamp     [default: `CURRENT_TIMESTAMP`, note: 'ON UPDATE CURRENT_TIMESTAMP']
+
+  Indexes {
+    (project_id, material_id) [unique, name: 'uq_rate']
+  }
+  Note: 'ราคาหักเงินต่อวัสดุต่อโครงการ — เดิม RateCard'
+}
+
+Table daily_check_confirms [headercolor: #82b366] {
+  id           int          [pk, increment]
+  project_id   int          [not null]
+  check_date   date         [not null]
+  confirmed_by varchar(100) [not null]
+  confirmed_at datetime     [not null]
+  item_count   int          [not null, default: 0]
+  notes        varchar(255) [null]
+
+  Indexes {
+    (project_id, check_date) [unique, name: 'uq_dc']
+  }
+  Note: 'ยืนยันการตรวจประจำวัน — เดิม DailyCheck'
+}
+
+Table deduction_docs [headercolor: #82b366] {
+  id         int          [pk, increment]
+  doc_no     varchar(40)  [not null, unique, note: 'SUB-{ProjectCode}-{YYYYMM}-{NN}']
+  project_id int          [not null]
+  ym         char(7)      [not null, note: 'yyyy-MM']
+  running_no int          [not null, note: 'รันต่อ (โครงการ, เดือน)']
+  sub_id     int          [null]
+  sub_name   varchar(150) [not null]
+  days_label varchar(255) [not null, default: '', note: 'ป้ายวันแบบเดิม']
+  days_json  text         [null, note: '[1,2,3,...] สำหรับ overlap check']
+  item_count int          [not null, default: 0]
+  issued_by  varchar(100) [not null]
+  issued_at  datetime     [not null]
+
+  Indexes {
+    (project_id, ym, running_no) [unique, name: 'uq_ded_run']
+    (project_id, ym, sub_name)   [name: 'idx_ded_lookup']
+  }
+  Note: 'ทะเบียนเลขที่ใบหักเงิน (ถาวร/idempotent) — เดิม DeductionDocs'
+}
+
+// ============================================================
+// LOOKUP / COUNTER
+// ============================================================
+
+Table doc_counters [headercolor: #999999] {
+  counter_type varchar(10) [not null, note: 'RD/OD/BD/IN/PK']
+  date_key     char(6)     [not null, note: 'DDMMYY เวลาไทย']
+  last_no      int         [not null, default: 0]
+
+  Indexes {
+    (counter_type, date_key) [pk]
+  }
+  Note: 'เลขรันประจำวันต่อชนิดเอกสาร (composite PK, ไม่มี id)'
+}
+
+Table sub_mango_map [headercolor: #999999] {
+  id          int          [pk, increment]
+  sub_code    varchar(10)  [not null, note: 'แมตช์ตาม code (sub อยู่หลายโครงการได้)']
+  vendor_code varchar(50)  [not null]
+  vendor_name varchar(150) [not null]
+
+  Indexes {
+    (sub_code, vendor_code) [unique, name: 'uq_smm']
+  }
+  Note: 'ตัวเลือก vendor ที่อนุญาตต่อผู้รับเหมา — เดิม SubMangoMap'
+}
+
+// ============================================================
+// SYSTEM / AUDIT
+// ============================================================
+
+Table error_logs [headercolor: #d79b00] {
+  id         int         [pk, increment]
+  project_id int         [null]
+  gate_code  varchar(20) [null]
+  message    text        [not null]
+  created_at timestamp   [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    created_at [name: 'idx_err_time']
+  }
+  Note: 'log จาก gate controller — เดิม ErrorLogs'
+}
+
+Table activity_log [headercolor: #d79b00] {
+  id          int         [pk, increment]
+  entity_type varchar(30) [not null, note: 'document/user/rate_card/stock']
+  entity_id   varchar(40) [not null, note: 'doc_no / username / id']
+  user_name   varchar(100) [null, note: 'ผู้กระทำ']
+  action      varchar(50) [not null, note: 'approve/reject/cancel/change_site']
+  old_value   text        [null]
+  new_value   text        [null]
+  created_at  timestamp   [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (entity_type, entity_id) [name: 'idx_al_entity']
+    (user_name, created_at)  [name: 'idx_al_user_time']
+  }
+  Note: 'audit กลาง (รวม UserLogs เดิม + เหตุการณ์เอกสาร/สต๊อก)'
+}
+
+Table login_attempts [headercolor: #d79b00] {
+  id           int          [pk, increment]
+  ip_address   varchar(45)  [not null]
+  username     varchar(150) [null]
+  attempted_at timestamp    [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (ip_address, attempted_at) [name: 'idx_ip_time']
+    (username, attempted_at)   [name: 'idx_user_time']
+  }
+  Note: 'rate-limit login (5 ครั้ง / 15 นาที)'
+}
+
+Table remember_tokens [headercolor: #d79b00] {
+  id             int      [pk, increment]
+  account_type   remember_account_type [not null]
+  account_id     int      [not null]
+  selector       char(24) [not null, unique]
+  validator_hash char(64) [not null, note: 'sha256 ของ validator']
+  expires_at     datetime [not null]
+  created_at     timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (account_type, account_id) [name: 'idx_rt_account']
+    expires_at                 [name: 'idx_rt_expires']
+  }
+  Note: 'จดจำอัตโนมัติ 30 วัน (selector + validator, หมุนทุกครั้ง)'
+}
+
+// ============================================================
+// FOREIGN KEYS  (label = ON DELETE)
+// ============================================================
+Ref: users.role_id > roles.id                        [delete: restrict]
+Ref: users.project_id > projects.id                   [delete: restrict]
+Ref: subcontractors.project_id > projects.id          [delete: restrict]
+Ref: gates.project_id > projects.id                   [delete: restrict]
+Ref: project_materials.project_id > projects.id       [delete: cascade]
+Ref: project_materials.material_id > materials.id     [delete: cascade]
+Ref: project_materials.gate_id > gates.id             [delete: set null]
+Ref: stock_balances.project_id > projects.id          [delete: cascade]
+Ref: stock_balances.material_id > materials.id        [delete: restrict]
+Ref: documents.project_id > projects.id               [delete: restrict]
+Ref: documents.receiver_sub_id > subcontractors.id    [delete: set null]
+Ref: documents.gate_id > gates.id                     [delete: restrict]
+Ref: document_items.document_id > documents.id        [delete: cascade]
+Ref: document_items.material_id > materials.id        [delete: set null]
+Ref: gate_logs.project_id > projects.id               [delete: cascade]
+Ref: gate_logs.document_id > documents.id             [delete: cascade]
+Ref: gate_logs.gate_id > gates.id                     [delete: restrict]
+Ref: rate_cards.project_id > projects.id              [delete: cascade]
+Ref: rate_cards.material_id > materials.id            [delete: cascade]
+Ref: daily_check_confirms.project_id > projects.id    [delete: cascade]
+Ref: deduction_docs.project_id > projects.id          [delete: restrict]
+Ref: deduction_docs.sub_id > subcontractors.id        [delete: set null]
+Ref: error_logs.project_id > projects.id              [delete: set null]
+
+// ------------------------------------------------------------
+// ความสัมพันธ์เชิงตรรกะ (บังคับใน PHP, ไม่มี FK constraint จริง)
+// เอา // ออกถ้าอยากให้ dbdiagram วาดเส้นให้ (ระวัง polymorphic ชี้ได้ 2 ตาราง)
+// ------------------------------------------------------------
+// Ref: documents.requester_username > users.username        // polymorphic: users.username หรือ subcontractors.sub_code
+// Ref: gate_logs.doc_no > documents.doc_no                  // เดินเรื่องด้วย doc_no (RT ชี้ BD เดิม)
+// Ref: sub_mango_map.sub_code > subcontractors.sub_code
+// Ref: sub_mango_map.vendor_code > mango_vendors.vendor_code
+// Ref: subcontractors.mango_vendor_code > mango_vendors.vendor_code
+// Ref: remember_tokens.account_id > users.id                // polymorphic: users หรือ subcontractors
+
+// ============================================================
+// TABLE GROUPS
+// ============================================================
+TableGroup master_dimension {
+  projects
+  roles
+  users
+  subcontractors
+  materials
+  gates
+  mango_vendors
+}
+
+TableGroup transactional {
+  documents
+  document_items
+  gate_logs
+  stock_balances
+  project_materials
+  rate_cards
+  deduction_docs
+  daily_check_confirms
+}
+
+TableGroup lookup_counter {
+  doc_counters
+  sub_mango_map
+}
+
+TableGroup system_audit {
+  error_logs
+  activity_log
+  login_attempts
+  remember_tokens
+}

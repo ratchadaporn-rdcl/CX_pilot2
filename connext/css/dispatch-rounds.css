@@ -1,0 +1,138 @@
+/*
+ * CONNEXT — css/dispatch-rounds.css  [PHP port 2026-09-24 · มติ 50]
+ * รอบจ่าย: แถบบนหน้าเบิก-จ่าย · ป้ายบนการ์ด QR · หน้าต่างตั้งค่า · กระดานบน Dashboard (แท็บ "รอบจ่าย")
+ * คู่กับ js/dispatch-rounds.js และ js/inventory-insights.js
+ */
+
+/* ---------- แถบบนหน้าเบิก-จ่าย ---------- */
+.dr-strip {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 0 0 0.9rem; padding: 0.65rem 0.85rem;
+    border-radius: 14px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a;
+}
+.dr-strip[hidden] { display: none; }
+.dr-strip.dr-soon { background: #fff7ed; border-color: #fdba74; color: #9a3412; }
+.dr-strip.dr-next { background: #f8fafc; border-color: var(--border); color: var(--secondary); }
+.dr-strip.dr-off  { background: #f8fafc; border: 1px dashed #cbd5e1; color: var(--text-muted); }
+.dr-ico { font-size: 1.35rem; flex: 0 0 auto; opacity: 0.9; }
+.dr-main { flex: 1 1 200px; min-width: 0; line-height: 1.4; }
+.dr-now { font-size: 0.95rem; }
+.dr-now b { font-weight: 800; }
+.dr-sub { font-size: 0.8rem; opacity: 0.85; }
+.dr-rcs { display: flex; flex-wrap: wrap; gap: 5px; }
+.dr-rc {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;
+    background: #fff; border: 1px solid #bfdbfe; color: #1e3a8a; font-variant-numeric: tabular-nums;
+}
+.dr-rc.done   { background: transparent; border-color: #cbd5e1; color: #94a3b8; font-weight: 500; }
+.dr-rc.closed { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+.dr-rc.cur    { background: #1e3a8a; border-color: #1e3a8a; color: #fff; box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3); }
+.dr-gear {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 40px; min-height: 40px;
+    padding: 0 10px; border: 1px solid rgba(30, 58, 138, 0.25); border-radius: 10px; background: #fff; color: var(--primary);
+    font: inherit; font-size: 0.86rem; font-weight: 600; cursor: pointer;
+}
+.dr-gear:hover { background: rgba(59, 130, 246, 0.08); }
+
+/* ---------- กล่องรอบจ่ายในหน้าต่างยืนยันเบิก / แจ้งสำเร็จ ---------- */
+.dr-confirm {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 0.75rem; padding: 0.65rem 0.8rem; border-radius: 12px;
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; text-align: left; line-height: 1.5;
+    white-space: normal;                                   /* ข้อความ popup เป็น pre-wrap */
+}
+.dr-confirm > i { margin-top: 3px; font-size: 1.1rem; flex: 0 0 auto; }
+.dr-confirm-t { font-size: 0.95rem; }
+.dr-confirm-t b { font-weight: 800; }
+.dr-confirm-s { font-size: 0.8rem; opacity: 0.9; }
+.dr-confirm.soon { background: #fff7ed; border-color: #fdba74; color: #9a3412; }
+.dr-confirm.ok   { background: #f0fdf4; border-color: #bbf7d0; color: #14532d; }
+
+/* ---------- ป้ายบนการ์ด QR ---------- */
+.dr-qchip {
+    display: inline-flex; align-items: center; gap: 5px; margin: 0.35rem 0 0 0; padding: 3px 10px; border-radius: 999px;
+    font-size: 0.76rem; font-weight: 700; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; white-space: nowrap;
+}
+.qrc-status + .dr-qchip { margin-left: 6px; }
+.dr-qchip.late { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+
+/* ---------- หน้าต่างตั้งค่า ---------- */
+html.dr-noscroll, html.dr-noscroll body { overflow: hidden; }
+.dr-backdrop {
+    position: fixed; inset: 0; z-index: 9997; display: none; align-items: flex-end; justify-content: center;
+    background: rgba(15, 23, 42, 0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.dr-backdrop.open { display: flex; }
+.dr-modal {
+    display: flex; flex-direction: column; width: 100%; max-width: 560px; max-height: 92vh; background: #fff;
+    border-radius: 20px 20px 0 0; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.18);
+}
+@media (min-width: 600px) { .dr-backdrop { align-items: center; } .dr-modal { border-radius: 20px; max-height: 88vh; } }
+.dr-mhead { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+.dr-mhead h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.05rem; color: var(--secondary); }
+.dr-mhead h3 i { color: var(--primary); }
+.dr-msite { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); background: #f1f5f9; padding: 2px 9px; border-radius: 999px; }
+.dr-x { margin-left: auto; width: 40px; height: 40px; border: 0; border-radius: 10px; background: #f1f5f9; color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
+.dr-mbody { flex: 1 1 auto; overflow-y: auto; padding: 14px 16px; -webkit-overflow-scrolling: touch; }
+.dr-mfoot { display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--border); }
+.dr-mfoot .btn { flex: 1; min-height: 48px; }
+.dr-switch { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--secondary); cursor: pointer; margin-bottom: 12px; }
+.dr-switch input { width: 22px; height: 22px; accent-color: var(--primary); }
+.dr-sec { margin-bottom: 14px; }
+.dr-lbl { font-size: 0.84rem; font-weight: 700; color: var(--secondary); margin-bottom: 6px; }
+.dr-hint { font-size: 0.8rem; font-weight: 400; color: var(--text-muted); }
+.dr-days { display: flex; flex-wrap: wrap; gap: 6px; }
+.dr-day {
+    min-width: 46px; min-height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 10px; background: #fff;
+    color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer;
+}
+.dr-day.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.dr-row { display: flex; align-items: flex-end; gap: 8px; padding: 8px 10px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 12px; background: #f8fafc; }
+.dr-row.bad { border-color: #ef4444; background: #fef2f2; }
+.dr-no { align-self: center; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.dr-tl { display: flex; flex-direction: column; gap: 2px; flex: 1 1 0; min-width: 0; font-size: 0.74rem; color: var(--text-muted); font-weight: 600; }
+.dr-tl input { width: 100%; min-height: 44px; font-size: 16px; }
+.dr-arrow { align-self: center; margin-top: 16px; color: var(--text-muted); }
+.dr-del { align-self: center; margin-top: 16px; width: 40px; height: 40px; flex: 0 0 auto; border: 0; border-radius: 10px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.dr-del:hover { background: rgba(239, 68, 68, 0.08); color: var(--danger); }
+.dr-rowbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.dr-rowbtns button {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid rgba(30, 58, 138, 0.25); border-radius: 10px;
+    background: rgba(59, 130, 246, 0.06); color: var(--primary); font: inherit; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+}
+.dr-preview { padding: 10px 12px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; font-size: 0.86rem; }
+.dr-preview ul { margin: 4px 0 4px 18px; padding: 0; line-height: 1.8; }
+.dr-preview li.dr-pv-next { color: #166534; opacity: 0.85; }
+.dr-err { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 0.85rem; line-height: 1.6; }
+.dr-err[hidden] { display: none; }
+
+/* ---------- กระดานรอบจ่าย (Dashboard) ---------- */
+.dr-board-round { border: 1px solid var(--border); border-radius: 14px; background: #fff; margin-bottom: 10px; overflow: hidden; }
+.dr-board-round > summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 0.7rem 0.9rem; background: #f8fafc;
+}
+.dr-board-round > summary::-webkit-details-marker { display: none; }
+.dr-board-round[open] > summary { border-bottom: 1px solid var(--border); }
+.dr-bt { font-size: 1.15rem; font-weight: 800; color: var(--secondary); font-variant-numeric: tabular-nums; }
+.dr-bw { font-size: 0.8rem; color: var(--text-muted); }
+.dr-bs { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dr-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+.dr-pill.open    { background: #dcfce7; color: #15803d; }
+.dr-pill.closed  { background: #fef3c7; color: #92400e; }
+.dr-pill.past    { background: #f1f5f9; color: var(--text-muted); }
+.dr-pill.upcoming{ background: #eff6ff; color: #1e40af; }
+.dr-pill.count   { background: var(--primary); color: #fff; }
+.dr-pill.wait    { background: #fee2e2; color: #b91c1c; }
+.dr-board-body { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 0.8rem 0.9rem; }
+@media (min-width: 900px) { .dr-board-body { grid-template-columns: 1.2fr 1fr; } }
+.dr-sub-h { font-size: 0.82rem; font-weight: 700; color: var(--secondary); margin-bottom: 6px; }
+.dr-doc { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.86rem; }
+.dr-doc:last-child { border-bottom: 0; }
+.dr-doc .id { font-weight: 700; color: var(--secondary); font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem; }
+.dr-doc .meta { color: var(--text-muted); font-size: 0.8rem; }
+.dr-doc .its { flex-basis: 100%; color: var(--text-main); font-size: 0.8rem; line-height: 1.5; }
+.dr-item { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--border); font-size: 0.86rem; }
+.dr-item:last-child { border-bottom: 0; }
+.dr-item b { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dr-item .c { display: block; font-family: ui-monospace, Menlo, monospace; font-size: 0.7rem; color: var(--primary); }
+.dr-empty { color: var(--text-muted); font-size: 0.84rem; padding: 4px 0; }
+.dr-overdue { border: 1px solid #fcd34d; background: #fffbeb; border-radius: 14px; padding: 0.7rem 0.9rem; margin-bottom: 12px; }
+.dr-overdue .dr-sub-h { color: #92400e; }

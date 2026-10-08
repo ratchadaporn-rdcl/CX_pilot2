@@ -1,0 +1,80 @@
+/*
+ * CONNEXT — css/transfer.css  [PHP port 2026-09-29 · TD ใบเบิกโอนย้ายข้ามไซต์]
+ * แท็บ "โอนย้ายข้ามไซต์ (TD)" ในหน้าเบิก: คำอธิบาย · ฟอร์ม · รายการที่จะโอน · การ์ดใบโอน (ส่งออก / โอนมา)
+ * คู่กับ js/transfer.js — ถ้า build index.php ใหม่ให้เติม <link> ไฟล์นี้กลับก่อน </head>
+ */
+
+.td-intro { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 1rem; padding: 10px 14px; border-radius: 12px;
+            background: #ecfeff; border: 1px solid #a5f3fc; color: #155e75; font-size: 0.86rem; line-height: 1.6; }
+.td-intro > i { margin-top: 4px; }
+.td-req { color: #dc2626; }
+.td-warn { color: #b91c1c; font-weight: 600; }
+.td-sub { font-size: 0.78rem; font-weight: 500; color: var(--text-muted, #64748b); }
+.td-add-btn, .td-submit-btn { width: 100%; min-height: 44px; }
+.td-count { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 7px;
+            border-radius: 999px; background: #0e7490; color: #fff; font-size: 0.78rem; margin-left: 6px; vertical-align: middle; }
+
+/* ---------- ดรอปดาวน์วัสดุ (select2) · ป้าย WMS ---------- */
+.td-opt-name { font-weight: 600; line-height: 1.35; }
+.td-opt-char { display: inline-block; font-size: 0.66rem; font-weight: 700; padding: 0 6px; border-radius: 6px; background: #e2e8f0; color: #334155; vertical-align: 1px; }
+.td-opt-sub { font-size: 0.74rem; opacity: 0.8; font-family: ui-monospace, Consolas, monospace; }
+.td-wms { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: #fef3c7; color: #92400e; margin-left: 4px; }
+
+/* ---------- รายการที่จะโอน ---------- */
+.td-cart { display: flex; flex-direction: column; gap: 6px; }
+.td-empty { padding: 14px; border: 1px dashed var(--border, #e2e8f0); border-radius: 10px; color: var(--text-muted, #64748b);
+            font-size: 0.86rem; text-align: center; background: var(--surface, #fff); }
+.td-split-note { font-size: 0.8rem; color: #0e7490; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 6px 10px; }
+.td-line { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border, #e2e8f0);
+           border-radius: 10px; background: var(--surface, #fff); }
+.td-gate { flex: none; font-weight: 700; font-size: 0.74rem; color: #0e7490; background: #cffafe; border-radius: 6px; padding: 2px 7px; }
+.td-line-main { flex: 1; min-width: 0; }
+.td-line-name { font-weight: 600; font-size: 0.88rem; overflow-wrap: anywhere; }
+.td-line-code { font-family: ui-monospace, Consolas, monospace; font-size: 0.74rem; color: var(--text-muted, #64748b); overflow-wrap: anywhere; }
+.td-line-qty { flex: none; font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+.td-line-qty small { font-weight: 500; color: var(--text-muted, #64748b); }
+.td-line-del { flex: none; width: 34px; height: 34px; border-radius: 8px; border: 1px solid #fecaca; background: #fff5f5;
+               color: #dc2626; cursor: pointer; }
+.td-line-del:hover { background: #fee2e2; }
+
+/* ---------- รายการใบโอน ---------- */
+.td-lists { margin-top: 1.4rem; }
+.td-list-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 1rem 0 0.6rem; }
+.td-list-head h3 { font-size: 1rem; color: var(--secondary, #0f172a); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.td-list-head h3 > i { color: #0e7490; }
+.td-refresh { position: static !important; }
+.td-doc-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.td-doc { background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0); border-radius: 12px; padding: 12px 14px;
+          box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.08)); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.td-doc.wait { border-left: 4px solid #f59e0b; }
+.td-doc.live { border-left: 4px solid #0e7490; }
+.td-doc.done { border-left: 4px solid #10b981; }
+.td-doc.dead { border-left: 4px solid #94a3b8; opacity: 0.75; }
+.td-doc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.td-doc-id { font-weight: 700; font-family: ui-monospace, Consolas, monospace; font-size: 0.9rem; overflow-wrap: anywhere; }
+.td-doc-route { font-size: 0.84rem; margin-top: 2px; }
+.td-doc-route i { font-size: 0.72rem; color: #0e7490; margin: 0 3px; }
+.td-state { flex: none; max-width: 55%; text-align: right; font-size: 0.74rem; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+            background: #f1f5f9; color: #334155; }
+.td-doc.wait .td-state { background: #fef3c7; color: #92400e; }
+.td-doc.live .td-state { background: #cffafe; color: #155e75; }
+.td-doc.done .td-state { background: #dcfce7; color: #166534; }
+.td-doc-meta { font-size: 0.76rem; color: var(--text-muted, #64748b); line-height: 1.5; }
+.td-its { border-top: 1px dashed var(--border, #e2e8f0); padding-top: 6px; display: flex; flex-direction: column; gap: 3px; }
+.td-it { display: flex; justify-content: space-between; gap: 8px; font-size: 0.84rem; }
+.td-it-name { min-width: 0; overflow-wrap: anywhere; }
+.td-it-name small { color: var(--text-muted, #64748b); font-family: ui-monospace, Consolas, monospace; }
+.td-it-qty { flex: none; font-weight: 700; white-space: nowrap; text-align: right; }
+.td-act { display: block; font-size: 0.7rem; font-weight: 600; color: #b45309; }
+.td-doc-note { font-size: 0.78rem; color: #475569; }
+.td-in-hint { font-size: 0.78rem; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 6px 9px; }
+.td-doc-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+.td-doc-actions .btn { width: auto; padding: 0.4rem 0.8rem; font-size: 0.82rem; min-height: 36px; }
+
+@media (max-width: 768px) {
+    .td-doc-list { grid-template-columns: 1fr; }
+    .td-state { max-width: 48%; }
+}
+
+/* select ต้นฉบับที่ select2 ซ่อนไว้ (ใช้ .form-control = width:100%) — ช่วงโหลดหน้าบนมือถือเคยกว้างเต็มจอจนหน้าเลื่อนข้างได้ · ล็อกให้เหลือ 1px เสมอ */
+#req-transfer select.select2-hidden-accessible { width: 1px !important; min-width: 0 !important; max-width: 1px !important; }

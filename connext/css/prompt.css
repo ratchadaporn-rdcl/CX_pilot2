@@ -1,0 +1,35 @@
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../fonts/prompt-v12-latin_thai-300.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/prompt-v12-latin_thai-regular.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../fonts/prompt-v12-latin_thai-500.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/prompt-v12-latin_thai-600.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../fonts/prompt-v12-latin_thai-700.woff2) format("woff2");
+}

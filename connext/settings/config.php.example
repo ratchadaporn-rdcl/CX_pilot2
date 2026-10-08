@@ -1,0 +1,9 @@
+<?php
+// CONNEXT — settings/config.php ← คัดลอกไฟล์นี้เป็น config.php แล้วกรอก gate_api_key
+// ห้ามเปิดเว็บเข้าโฟลเดอร์นี้ (.htaccess ชั้นนอกกันไว้แล้ว)
+return array (
+  'app_name'     => 'CONNEXT',
+  'env'          => 'production',          // 'development' = โชว์ error บนหน้าเว็บ (ใช้เฉพาะตอนไล่ปัญหา)
+  'installed_at' => '',
+  'gate_api_key' => '',   // key กลางของตู้ (ตู้ที่มี key ของตัวเองใน ตั้งค่าระบบ → ประตู ไม่ใช้ค่านี้)
+);

@@ -1,0 +1,229 @@
+/*
+ * CONNEXT — css/mobile-flow.css  [PHP port 2026-09-23 mobile-first]
+ * หน้า "เบิก-จ่าย" · "QR" · "ถ่ายรูปยืนยัน" แบบมือถือเป็นหลัก (จอ ≤ 768px — จุดเดียวกับที่แอปสลับเป็นเมนูมือถือ)
+ *
+ * แยกไฟล์จาก index.php โดยตั้งใจ: index.php ถูก generate จาก GAS (tools/build_index.py ไม่มีในเครื่องนี้)
+ * ถ้า build ใหม่ให้เติม <link> ไฟล์นี้ + <script js/mobile-flow.js> กลับก่อน </head> เท่านั้น
+ * ทุกกฎผูกกับ id ของหน้า (#requisition-page / #qr-page / #confirm-page / #qrModal) → ชนะกฎเดิมที่เป็น class ล้วน
+ * ไม่ว่าไฟล์นี้จะโหลดก่อน/หลัง <style> ในตัว index.php · จอใหญ่กว่า 768px หน้าตาเหมือนเดิมทุกอย่าง
+ * ส่วนที่ต้องมี element เพิ่ม (ชื่อแท็บสั้น · แถบรายการเตรียมเบิก · ปุ่มค้นหา QR · สถานะรอสแกน) สร้างโดย js/mobile-flow.js
+ */
+
+/* ---- ของที่ js/mobile-flow.js เติม: จอใหญ่ซ่อนไว้ ---- */
+.mf-tab-short, .mf-qr-more, .mf-qr-x, .mf-qr-hint, .mf-draft-bar { display: none; }
+
+/* สถานะ "รอสแกนที่ประตู" ใต้ QR — ทุกขนาดจอ */
+.mf-qr-status {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 0 auto 0.85rem; padding: 6px 14px; border-radius: 999px; width: fit-content; max-width: 100%;
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.85rem; font-weight: 600; line-height: 1.35;
+}
+.mf-pulse {
+    width: 10px; height: 10px; border-radius: 50%; background: #2563eb; flex: 0 0 auto;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55); animation: mfPulse 1.6s ease-out infinite;
+}
+@keyframes mfPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55); }
+    80%  { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .mf-pulse { animation: none; } }
+
+@media (max-width: 768px) {
+
+    /* ================================================================
+       หัวหน้า 3 หน้า — ตัดคำอธิบายยาวออก ให้ของจริงขึ้นในจอแรก
+       ================================================================ */
+    #requisition-page .page-header, #qr-page .page-header, #confirm-page .page-header { margin-bottom: 0.6rem; }
+    #requisition-page .page-title, #qr-page .page-title, #confirm-page .page-title { font-size: 1.1rem; }
+    #requisition-page .page-subtitle, #qr-page .page-subtitle, #confirm-page .page-subtitle { display: none; }
+
+    /* ================================================================
+       เบิก-จ่าย
+       ================================================================ */
+    /* แท็บ 4 ชนิด → ปุ่มแบ่งช่องเท่ากัน ไอคอนบน ชื่อสั้นล่าง เห็นครบไม่ต้องเลื่อน */
+    #requisition-page .tabs-container { margin-top: 0.25rem; background: transparent; box-shadow: none; border-radius: 0; overflow: visible; }
+    #requisition-page .tabs-header {
+        display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+        padding: 4px; background: #e2e8f0; border: 0; border-radius: 14px; overflow: visible;
+    }
+    #requisition-page .tab-btn {
+        flex-direction: column; justify-content: center; gap: 3px; min-width: 0; min-height: 58px;
+        padding: 7px 2px; border-radius: 11px; font-size: 0.74rem; line-height: 1.2;
+        white-space: normal; text-align: center; color: var(--text-muted);
+        -webkit-tap-highlight-color: transparent;
+    }
+    #requisition-page .tab-btn i { font-size: 1.15rem; }
+    #requisition-page .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.14); }
+    #requisition-page .tab-btn.active::after { display: none; }
+    #requisition-page .tab-btn .mf-tab-long { display: none; }
+    #requisition-page .tab-btn .mf-tab-short { display: block; }
+
+    /* การ์ดซ้อนการ์ด → ชั้นเดียว ได้ความกว้างฟอร์มคืนมา */
+    #requisition-page .tab-content { padding: 0.75rem 0 0; }
+    #requisition-page .grid-layout { gap: 0.85rem; }
+    #requisition-page .form-section,
+    #requisition-page .grid-layout > div:not(.form-section) {
+        background: #fff; border: 1px solid var(--border); border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); padding: 0.85rem;
+    }
+    #requisition-page .form-section h3, #requisition-page .grid-layout h3 { font-size: 1rem; margin-bottom: 0.75rem !important; }
+    #requisition-page .form-group { margin-bottom: 0.8rem; }
+    #requisition-page .form-group > label { font-size: 0.88rem; }
+
+    /* ช่อง Select2 สูงเท่าช่องอื่น (48px) */
+    #requisition-page .select2-container--default .select2-selection--single { height: 48px; border-radius: 12px; }
+    #requisition-page .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 46px; }
+    #requisition-page .select2-container--default .select2-selection--single .select2-selection__arrow { height: 46px; }
+
+    /* กล่องคำใบ้ยอดคงเหลือ/ประตู — เล็กลง */
+    #requisition-page .balance-hint { margin-top: 0.35rem; padding: 0.45rem 0.65rem; border-radius: 10px; font-size: 0.8rem; }
+
+    /* ปุ่ม "บันทึก/เพิ่มรายการ" เต็มความกว้าง แตะง่าย */
+    #requisition-page .form-section > .btn { width: 100%; min-height: 52px; font-size: 1rem; border-radius: 12px; }
+
+    /* ยืม-คืน: "อุปกรณ์ที่ยังไม่ส่งคืน" เป็นการ์ดเหมือนส่วนอื่น (เดิมเป็นเส้นคั่น + ช่องว่าง 3rem) */
+    #req-borrow > div:not(.grid-layout) {
+        margin-top: 0.85rem !important; padding: 0.85rem !important; border: 1px solid var(--border) !important;
+        border-radius: 16px; background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    #req-borrow > div:not(.grid-layout) > h3 { font-size: 1rem; margin-bottom: 0.75rem !important; }
+
+    /* ปุ่มส่ง (ยืม/รับเข้า ได้คลาส draft-actions จาก JS) */
+    #requisition-page .draft-actions { margin-left: -0.85rem; margin-right: -0.85rem; margin-bottom: -0.85rem; border-radius: 0 0 16px 16px; }
+    #requisition-page .draft-actions .btn { min-height: 52px; border-radius: 12px; }
+
+    /* แถบลอย "รายการเตรียมเบิก N รายการ" — ขึ้นเมื่อมีรายการและรายการอยู่นอกจอ */
+    .mf-draft-bar {
+        position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 60;
+        align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 16px;
+        background: var(--secondary); color: #fff; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.32);
+        font-size: 0.9rem; transform: translateY(0); transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .mf-draft-bar.show { display: flex; }
+    .mf-draft-bar .mf-db-text { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; line-height: 1.3; }
+    .mf-draft-bar .mf-db-text i { color: #fbbf24; font-size: 1.05rem; }
+    .mf-draft-bar .mf-db-count {
+        display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 7px;
+        border-radius: 999px; background: #fbbf24; color: #0f172a; font-weight: 800; font-size: 0.85rem;
+    }
+    .mf-draft-bar .mf-db-count.bump { animation: mfBump 0.35s ease; }
+    @keyframes mfBump { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
+    .mf-draft-bar .mf-db-go {
+        flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px;
+        border: 0; border-radius: 12px; background: #fff; color: var(--primary); font: inherit; font-weight: 700; cursor: pointer;
+    }
+    body.mf-has-draftbar #requisition-page { padding-bottom: 76px; }
+
+    /* ================================================================
+       QR
+       ================================================================ */
+    /* ตัวเลขสรุป 3 กล่องเรียงแนวตั้ง → แถวเดียว */
+    #qr-page .qr-summary-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 0.6rem; }
+    #qr-page .qr-summary-card {
+        display: flex; flex-direction: column; justify-content: space-between;   /* ป้ายยาว 2 บรรทัดก็ให้ตัวเลขตรงกัน */
+        padding: 0.5rem 0.55rem; border-radius: 12px; text-align: center;
+    }
+    #qr-page .qr-summary-label { font-size: 0.68rem; line-height: 1.25; margin-bottom: 0.1rem; }
+    #qr-page .qr-summary-value { font-size: 1.15rem; line-height: 1.25; }
+
+    /* ตัวกรอง: ชนิดเอกสารแถวเดียวเลื่อนข้าง · ค้นหา/ผู้ขอเบิก ซ่อนหลังปุ่ม 🔍 */
+    #qr-page .qr-filter-bar { gap: 0.55rem; padding: 0.55rem; margin-bottom: 0.9rem; border-radius: 14px; }
+    #qr-page .qr-tab-row {
+        flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        margin: 0 -0.55rem; padding: 1px 0.55rem 2px;
+    }
+    #qr-page .qr-tab-row::-webkit-scrollbar { display: none; }
+    #qr-page .qr-tab { flex: 0 0 auto; min-height: 42px; padding: 0.45rem 0.85rem; }
+    #qr-page .qr-tab.mf-qr-more { display: inline-flex; position: relative; padding: 0.45rem 0.75rem; }
+    #qr-page .qr-tab.mf-qr-more.has-filter::after {
+        content: ""; position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent); box-shadow: 0 0 0 2px #fff;
+    }
+    #qr-page .qr-filter-bar.mf-open .qr-tab.mf-qr-more { background: #eff6ff; color: var(--primary); border-color: rgba(59, 130, 246, 0.4); }
+    /* ซ่อนเฉพาะเมื่อ JS ใส่ปุ่ม 🔍 แล้ว (mf-ready) — JS โหลดไม่ขึ้นก็ยังเห็นตัวกรองครบ */
+    #qr-page .qr-filter-bar.mf-ready:not(.mf-open) > select,
+    #qr-page .qr-filter-bar.mf-ready:not(.mf-open) > input,
+    #qr-page .qr-filter-bar.mf-ready:not(.mf-open) > div:not(.qr-tab-row) { display: none !important; }   /* div นี้มี inline display:flex */
+    #qr-page .qr-filter-bar .btn-primary { display: none; }            /* รีเฟรช = ปุ่มบนหัวหน้าอยู่แล้ว */
+    #qr-page .qr-filter-bar .qr-clear-filter-btn { width: 100%; min-height: 44px; }
+
+    /* การ์ดเอกสาร: เต็มกว้าง (เดิมจอ ≤480px ถูกจัดกึ่งกลางจนแคบ) · ปุ่ม "ดู QR" ใหญ่ทางขวามือ */
+    #qr-page .qr-doc-card { align-items: stretch; }
+    #qr-page .qr-doc-card:hover { transform: none; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+    #qr-page .qr-doc-card .qrc-section { padding: 0.75rem 0.9rem; }
+    #qr-page .qr-doc-card .qrc-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; padding: 0.65rem; }
+    #qr-page .qr-doc-card .qrc-actions .btn { width: 100%; min-height: 52px; font-size: 1rem; border-radius: 12px; }
+    #qr-page .qr-doc-card .qrc-actions .btn:only-child { grid-column: 1 / -1; }
+    #qr-page .qr-doc-card .qrc-actions .btn-danger {
+        background: #fff; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.45); box-shadow: none; font-size: 0.92rem;
+    }
+    #qr-page .qr-gate-header { border-radius: 14px; padding: 0.65rem 0.85rem; }
+
+    /* หน้าต่าง QR → เต็มจอ QR ใหญ่ ไว้ยื่นให้เครื่องสแกนที่ประตู */
+    html.mf-noscroll, html.mf-noscroll body { overflow: hidden; }
+    #qrModal.open { align-items: stretch; justify-content: stretch; background: #fff; }
+    #qrModal .qr-modal-box {
+        position: relative; display: flex; flex-direction: column; width: 100%; max-width: none; height: 100%;
+        border-radius: 0; box-shadow: none; animation: none; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+    #qrModal .qr-modal-box h3 { font-size: 1.05rem; margin: 0.35rem 44px 0.2rem; line-height: 1.35; }
+    #qrModal .qr-meta { font-size: 0.86rem; margin: 0.45rem 0 0.6rem; line-height: 1.5; }   /* เริ่มใต้ปุ่ม ✕ */
+    #qrModal #qrCanvas { margin: 0.25rem 0 0.75rem; }
+    #qrModal #qrCanvas img {
+        width: min(84vw, 50vh, 380px); height: auto; border: 12px solid #fff; border-radius: 14px;
+        box-shadow: 0 0 0 1px var(--border), 0 8px 22px rgba(15, 23, 42, 0.1);
+    }
+    #qrModal .mf-qr-x {
+        display: flex; align-items: center; justify-content: center; position: absolute;
+        top: calc(8px + env(safe-area-inset-top, 0px)); right: 8px; width: 44px; height: 44px;
+        border: 0; border-radius: 12px; background: #f1f5f9; color: var(--text-main); font-size: 1.25rem; cursor: pointer;
+    }
+    #qrModal .mf-qr-hint { display: block; margin: -0.35rem 0 0.8rem; text-align: center; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+    #qrModal .qr-items-list { max-height: none; flex: 1 1 auto; font-size: 0.9rem; border-radius: 12px; margin-bottom: 0.85rem; }
+    #qrModal .qr-items-list div { padding: 0.4rem 0; }
+    #qrModal .qr-modal-actions { flex-direction: row; gap: 0.6rem; margin-top: auto; }
+    #qrModal .qr-modal-actions button {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        min-height: 52px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+    }
+
+    /* ================================================================
+       ถ่ายรูปยืนยัน
+       ================================================================ */
+    #confirm-page .pick-summary { border-radius: 16px; }
+    #confirm-page .cw-progress { gap: 0.4rem; }
+    #confirm-page .cw-dot { width: 34px; height: 34px; font-size: 0.8rem; }      /* จุดเลือกเอกสาร แตะง่ายขึ้น */
+    #confirm-page .cw-card { border-radius: 16px; }
+    #confirm-page .cw-section { padding: 0.85rem 0.9rem; }
+
+    /* ปุ่มกล้อง = ปุ่มหลักเต็มกว้าง · เลือกจากคลังภาพ = ปุ่มรองด้านล่าง */
+    #confirm-page .upload-area { border: 0; background: transparent; padding: 0; }
+    #confirm-page .upload-btn-row { flex-direction: column; gap: 0.5rem; }
+    #confirm-page .upload-btn {
+        flex: 0 0 auto; flex-direction: row; justify-content: center; gap: 0.6rem;
+        min-height: 62px; border-radius: 14px; font-size: 1.08rem; font-weight: 700;
+    }
+    #confirm-page .upload-btn i { font-size: 1.4rem; }
+    #confirm-page .upload-btn-file { min-height: 46px; font-size: 0.92rem; font-weight: 600; background: #fff; }
+    #confirm-page .upload-btn-file i { font-size: 1.05rem; }
+    #confirm-page .upload-hint { margin-top: 0.45rem; }
+
+    /* รูปที่ถ่ายแล้ว: ตาราง 3 ช่องเต็มความกว้าง · ปุ่มลบใหญ่ขึ้น */
+    #confirm-page .preview-images { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 0.75rem; }
+    #confirm-page .preview-img-container { width: auto; height: auto; aspect-ratio: 1 / 1; border-radius: 12px; }
+    #confirm-page .remove-img {
+        top: 4px; right: 4px; width: 32px; height: 32px; font-size: 1.15rem; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+    #confirm-page .cw-nav { padding: 0.75rem 0.9rem; }
+    #confirm-page .cw-nav .btn { min-height: 50px; border-radius: 12px; }
+}
+
+/* dropdown ค้นวัสดุ (Select2) บนมือถือ — แถวสูงพอแตะ · รายการยาวขึ้น (dropdown อยู่ใต้ body จึงผูก id หน้าไม่ได้) */
+@media (max-width: 768px) {
+    .select2-container--open .select2-dropdown { border-radius: 12px; overflow: hidden; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18); }
+    .select2-container--default .select2-results > .select2-results__options { max-height: min(45vh, 360px); }
+    .select2-container--default .select2-results__option { padding: 10px 12px; line-height: 1.35; }
+}

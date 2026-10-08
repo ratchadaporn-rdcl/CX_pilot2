@@ -1,0 +1,7 @@
+{
+    "source": "C:\\xampp\\htdocs\\connext",
+    "built_at": "2026-10-08T14:09:47+07:00",
+    "tool": "connext-local/dist/make_deploy.py",
+    "db_dump": "connext-full-2026-10-08.sql",
+    "note": "production build — settings/database.php must be created on the server"
+}

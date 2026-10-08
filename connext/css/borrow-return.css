@@ -1,0 +1,139 @@
+/*
+ * CONNEXT — css/borrow-return.css  [PHP port 2026-09-29 · เอกสาร 05 Scenario ③ ใบยืม (ฉบับแก้)]
+ * ช่องกำหนดวันคืน · รายการค้างคืน (ป้ายเกินกำหนด / สถานะ / ปุ่มตีชำรุด-สูญหาย) · หน้าต่างตีชำรุด/สูญหาย ·
+ * ป้ายบนการ์ด QR / การอนุมัติ · การ์ด Dashboard · แจ้งเตือนในแอป
+ * คู่กับ js/borrow-return.js — ถ้า build index.php ใหม่ให้เติม <link> ไฟล์นี้กลับก่อน </head>
+ * (ใช้คลาส .s5-* ของ css/scenario05.css ร่วม — การ์ด Dashboard / ชิปเหตุผล / รูปย่อ)
+ */
+
+/* ---------- ฟอร์มยืม: กำหนดวันคืน ---------- */
+.br-due-group input[type="date"] { min-height: 42px; }
+.br-due-group input.br-invalid { border-color: #ef4444; background: #fff7f7; }
+.br-due-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.br-chip { border: 1px solid var(--border, #e2e8f0); background: #fff; color: #334155; border-radius: 999px; padding: 4px 11px;
+           font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; min-height: 30px; }
+.br-chip:hover { border-color: #93c5fd; background: #eff6ff; }
+.br-due-err { font-size: 0.78rem; font-weight: 600; color: #b91c1c; margin-top: 4px; }
+.br-due-err:empty { display: none; }
+.br-due-hint { font-size: 0.76rem; color: var(--text-muted, #64748b); margin-top: 4px; line-height: 1.5; }
+.br-due-summary { margin-top: 10px; padding: 8px 12px; border-radius: 10px; font-size: 0.84rem; line-height: 1.5; }
+.br-due-summary.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+.br-due-summary.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.br-confirm { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 10px; border-radius: 10px;
+              background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; font-size: 0.86rem; white-space: normal; }
+
+/* ---------- ป้ายกำหนดคืน ---------- */
+.br-due { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; padding: 1px 8px; border-radius: 999px;
+          font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+.br-due.over { background: #fee2e2; color: #b91c1c; }
+.br-due.soon { background: #ffedd5; color: #c2410c; }
+.br-due.ok { background: #e0f2fe; color: #075985; }
+.br-due.none { background: #f1f5f9; color: #64748b; font-weight: 600; }
+
+/* ---------- รายการค้างคืน ---------- */
+.br-unret td { vertical-align: top; }
+.br-date { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.br-date > span:first-child { white-space: nowrap; }
+.br-row.overdue td:first-child { box-shadow: inset 4px 0 0 #ef4444; }
+.br-doc { font-weight: 700; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.86rem; color: var(--secondary, #1e293b); }
+.br-sub { font-size: 0.76rem; color: var(--text-muted, #64748b); }
+.br-it { font-size: 0.86rem; line-height: 1.5; padding: 2px 0; }
+.br-it.done { color: #94a3b8; text-decoration: line-through; }
+.br-code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.72rem; font-weight: 700; color: var(--primary, #1e3a8a); }
+.br-why { font-size: 0.74rem; color: #b45309; }
+.br-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.br-state { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; background: #f1f5f9; color: #334155;
+            font-size: 0.74rem; font-weight: 700; }
+.br-state.info { background: #dbeafe; color: #1d4ed8; }
+.br-state.warn { background: #ffedd5; color: #c2410c; }
+.br-state.bad { background: #fee2e2; color: #b91c1c; }
+.br-acts { white-space: nowrap; }
+.br-acts .br-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 0.4rem 0.8rem; font-size: 0.84rem;
+                   margin-bottom: 6px; min-height: 36px; }
+.br-btn-wo { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+.br-btn-wo:hover { background: #ffe4e6; }
+
+/* ---------- หน้าต่างตีชำรุด/สูญหาย (ใต้ #appPopupModal ที่ z-index 10001 — หน้าต่างยืนยันขึ้นทับได้) ---------- */
+body.br-noscroll { overflow: hidden; }
+.br-modal { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, 0.55); align-items: center;
+            justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+.br-modal.open { display: flex; }
+.br-modal-card { width: min(96vw, 620px); max-height: calc(100vh - 2rem); display: flex; flex-direction: column; background: #fff;
+                 border-radius: 18px; box-shadow: 0 28px 70px rgba(15, 23, 42, 0.28); overflow: hidden; }
+.br-modal-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--border, #e2e8f0); }
+.br-modal-title { flex: 1; font-weight: 700; color: #9f1239; font-size: 1rem; }
+.br-x { width: 36px; height: 36px; border-radius: 10px; border: 0; background: #f1f5f9; font-size: 1.3rem; cursor: pointer; line-height: 1; }
+.br-modal-body { padding: 12px 16px; overflow-y: auto; }
+.br-modal-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border, #e2e8f0);
+                 background: #f8fafc; }
+.br-modal-foot .btn { width: auto; min-height: 42px; }
+.br-modal-foot .btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+.br-wo-sum { flex: 1 1 240px; font-size: 0.82rem; font-weight: 600; line-height: 1.5; }
+.br-wo-sum.ready { color: #15803d; }
+.br-wo-sum.wait { color: #b45309; }
+.br-wo-info { font-size: 0.86rem; line-height: 1.6; margin-bottom: 8px; }
+.br-wo-note { font-size: 0.8rem; line-height: 1.55; padding: 8px 10px; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+.br-wo-sec { font-size: 0.84rem; font-weight: 700; color: var(--secondary, #1e293b); margin: 12px 0 6px; }
+.br-wo-item { border: 1px solid var(--border, #e2e8f0); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; background: #fff; }
+.br-wo-item.on { border-color: #fda4af; background: #fff7f8; }
+.br-wo-pick { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.br-wo-pick input { width: 20px; height: 20px; margin-top: 2px; flex: 0 0 auto; }
+.br-wo-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; margin-top: 8px; }
+.br-wo-fields label { display: flex; flex-direction: column; gap: 3px; font-size: 0.76rem; color: var(--text-muted, #64748b); font-weight: 600; }
+.br-wo-fields input { width: 110px; height: 40px; border: 1px solid var(--border, #e2e8f0); border-radius: 10px; padding: 0 8px; font-family: inherit;
+                      font-size: 0.95rem; font-weight: 700; }
+.br-wo-price { font-size: 0.78rem; color: #334155; }
+.br-seg { display: inline-flex; border: 1px solid var(--border, #e2e8f0); border-radius: 10px; overflow: hidden; }
+.br-seg button { border: 0; background: #fff; padding: 0 14px; height: 40px; font-family: inherit; font-size: 0.84rem; font-weight: 700; color: #475569; cursor: pointer; }
+.br-seg button.on { background: #be123c; color: #fff; }
+.br-wo-hist { margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border, #e2e8f0); }
+.br-wo-hrow { font-size: 0.76rem; color: #475569; line-height: 1.5; }
+
+/* ---------- การ์ด QR / การอนุมัติ ---------- */
+.br-qr-due .qrc-value { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.br-ap-wrap { margin-top: 0.6rem; }
+.br-ap { font-size: 0.84rem; line-height: 1.5; margin-top: 4px; color: #334155; }
+.br-ap.bad { color: #b91c1c; font-weight: 600; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 6px 9px; }
+.br-ap.ok { color: #15803d; }
+.br-ap.muted { color: var(--text-muted, #64748b); }
+
+/* ---------- Dashboard ---------- */
+#brAlerts { margin-bottom: 1rem; }
+.br-alert-card { border-color: #fecdd3; }
+.br-alert-card .s5-alert-head { color: #9f1239; }
+.s5-alert-title.info { color: #1d4ed8; }
+.s5-cnt.info { background: #dbeafe; color: #1d4ed8; }
+.br-alert-go { margin-top: 10px; text-align: right; }
+.br-alert-go .btn { width: auto; font-size: 0.84rem; padding: 0.4rem 0.9rem; }
+
+/* ---------- แจ้งเตือนในแอป ---------- */
+#brNotices { position: fixed; right: 16px; top: 76px; z-index: 9990; width: min(92vw, 380px); display: flex; flex-direction: column; gap: 8px; }
+#brNotices[hidden] { display: none; }
+.br-notice { background: #fff; border: 1px solid #fecdd3; border-left: 5px solid #e11d48; border-radius: 14px; padding: 10px 12px;
+             box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18); }
+.br-notice-t { font-weight: 700; color: #9f1239; font-size: 0.9rem; line-height: 1.45; }
+.br-notice-b { font-size: 0.8rem; color: #334155; white-space: pre-line; margin-top: 4px; line-height: 1.5; max-height: 9.5em; overflow-y: auto; }
+.br-notice-m { font-size: 0.72rem; color: var(--text-muted, #64748b); margin-top: 4px; }
+.br-notice-a { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
+.br-notice-a .btn { width: auto; min-height: 36px; padding: 0.3rem 0.8rem; font-size: 0.82rem; }
+.br-notice-more { font-size: 0.78rem; text-align: right; color: #475569; background: #fff; border-radius: 10px; padding: 6px 10px;
+                  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12); }
+.br-notice-more button { border: 0; background: none; color: #be123c; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+@media (max-width: 768px) {
+    .br-acts { white-space: normal; }
+    .br-acts .br-btn { min-height: 44px; }
+    .br-chip { min-height: 36px; padding: 6px 12px; }
+    .br-modal { padding: 0; align-items: flex-end; }
+    .br-modal-card { width: 100vw; max-height: 92vh; border-radius: 18px 18px 0 0; }
+    .br-modal-foot .btn { flex: 1 1 45%; min-height: 46px; }
+    .br-wo-fields input { width: 120px; height: 44px; font-size: 16px; }
+    .br-seg button { height: 44px; }
+    #brNotices { left: 8px; right: 8px; top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: auto; }
+}
+
+/* [2026-10-02 · GP-13] คำเตือน delay: ผู้ส่งมีใบยืมเกินกำหนดค้าง (เตือนอย่างเดียว ไม่บล็อก) */
+.br-overdue-warn { display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 10px; padding: 9px 12px; border-radius: 10px;
+                   background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 0.86rem; font-weight: 600; line-height: 1.45; }
+.br-overdue-warn i { margin-top: 3px; }
+.br-confirm.warn { background: #fef2f2; border-color: #fecaca; color: #991b1b; }

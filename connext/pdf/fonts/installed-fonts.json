@@ -1,0 +1,8 @@
+{
+    "sarabun": {
+        "normal": "SarabunPdf-Regular",
+        "bold": "SarabunPdf-Bold",
+        "italic": "SarabunPdf-Regular",
+        "bold_italic": "SarabunPdf-Bold"
+    }
+}

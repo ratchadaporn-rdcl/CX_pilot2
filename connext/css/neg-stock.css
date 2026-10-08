@@ -1,0 +1,12 @@
+/* CONNEXT — css/neg-stock.css : ยอดติดลบ / ยอดไม่พอ = สีแดง (GP-42 · 2 ต.ค. 2026) */
+#inventoryTableBody td.cnx-neg { color: #b91c1c; }
+.cnx-neg-badge { background: #7f1d1d; color: #fff; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; }
+.dash-gate-chip.is-neg { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+.dash-gate-chip.is-neg b { color: #991b1b; }
+#mdValBalance.cnx-neg { color: #b91c1c; }
+.md-gate-row.is-neg .g-num { color: #b91c1c; }
+.md-gate-row.is-neg { background: #fef2f2; }
+b.cnx-neg { color: #b91c1c; }
+.cnx-stock-warn { display: flex; gap: 8px; align-items: flex-start; margin-top: 6px; padding: 7px 10px; border-radius: 8px;
+                  background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 0.82rem; line-height: 1.5; }
+.cnx-stock-warn i { margin-top: 3px; }

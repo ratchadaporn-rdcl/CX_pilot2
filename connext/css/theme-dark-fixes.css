@@ -1,0 +1,9 @@
+/* CONNEXT — css/theme-dark-fixes.css : โหมดมืด — จุดที่สร้างอัตโนมัติไม่ได้ (2026-10-08 · แก้มือได้)
+ * โหลดหลัง theme-dark-addons.css (หน้าแอป) และ theme-dark-modules.css (หน้าโมดูล) · มีผลเฉพาะ html[data-theme="dark"] */
+
+/* สไตล์ inline ที่ JS เสริมสร้างเอง (js/scenario05.js · js/borrow-return.js) */
+html[data-theme="dark"] [style*="background:#fef2f2" i]{background:var(--error-bg)!important;border-color:var(--border)!important;color:var(--error-text)!important}
+html[data-theme="dark"] [style*="color:#dc2626" i]{color:var(--error-text)!important}
+
+/* หน้าถ่ายรูปยืนยัน: จุดใบที่ยืนยันแล้ว + กำลังดูอยู่ — พื้นเป็น var(--success) (ทองในโหมดมืด) ตัวอักษรขาวหาย */
+html[data-theme="dark"] .cw-dot.current.done{color:var(--on-action)}

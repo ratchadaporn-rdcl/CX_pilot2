@@ -1,0 +1,9 @@
+<?php
+// CONNEXT — settings/database.php  ← คัดลอกไฟล์นี้เป็น database.php แล้วกรอกค่าของ server จริง
+// (ระบบจะพาไปหน้าตัวติดตั้งถ้ายังไม่มีไฟล์ database.php)
+return array (
+  'host'   => 'localhost',     // host ของ MySQL/MariaDB (เช่น localhost หรือ 127.0.0.1)
+  'dbname' => 'connext',       // ชื่อฐานข้อมูลที่ import ไฟล์ database/connext-full-*.sql เข้าไป
+  'user'   => 'connext',       // ผู้ใช้ DB (ควรสร้างแยก ไม่ใช้ root)
+  'pass'   => '',              // รหัสผ่าน
+);
